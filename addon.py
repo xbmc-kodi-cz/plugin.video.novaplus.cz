@@ -4,9 +4,6 @@ import urllib2,urllib,re,os,string,time,base64,datetime
 from parseutils import *
 import xbmcplugin,xbmcgui,xbmcaddon
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
 __baseurl__ = 'http://novaplus.nova.cz'
 __dmdbase__ = 'http://iamm.uvadi.cz/xbmc/voyo/'
 _UserAgent_ = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'
@@ -14,8 +11,8 @@ addon = xbmcaddon.Addon('plugin.video.novaplus.cz')
 profile = xbmc.translatePath(addon.getAddonInfo('profile'))
 __settings__ = xbmcaddon.Addon(id='plugin.video.novaplus.cz')
 home = __settings__.getAddonInfo('path')
-icon = xbmc.translatePath( os.path.join( home, 'icon.png' ) )
-fanart = xbmc.translatePath( os.path.join( home, 'fanart.jpg' ) )
+#icon = xbmc.translatePath( os.path.join( home, 'icon.png' ) )
+#fanart = xbmc.translatePath( os.path.join( home, 'fanart.jpg' ) )
 
 addon_handle = int(sys.argv[1])
 
@@ -28,17 +25,16 @@ def logDbg(msg):
     log(msg,level=xbmc.LOGDEBUG)
 
 def OBSAH():
-    addDir('Poslední díly','https://novaplus.nova.cz',2,icon)
-    addDir('TOP pořady','https://novaplus.nova.cz',3,icon)
-    addDir('Všechny pořady','https://novaplus.nova.cz/porady/',4,icon)
-    addDir('Televizní noviny','https://novaplus.nova.cz/porad/televizni-noviny',5,icon)
+    addDir('Poslední díly','https://novaplus.nova.cz',2,'')
+    addDir('TOP pořady','https://novaplus.nova.cz',3,'')
+    addDir('Všechny pořady','https://novaplus.nova.cz/porady/',4,'')
+    addDir('Televizní noviny','https://novaplus.nova.cz/porad/televizni-noviny',5,'')
 
 def HOME_POSLEDNI(url):
     doc = read_page(url)
    
     for section in doc.findAll('section', 'b-main-section b-section-articles my-5'):
         if section.h3.getText(" ").encode('utf-8') == 'POSLEDNÍ DÍLY':
-            print "mame spleno"
             #print section.div.h3.getText(" ").encode('utf-8')
             for article in section.div.findAll('article'):
                 url = article.a['href'].encode('utf-8')
@@ -75,6 +71,7 @@ def SHOWS(url):
           url = article.a['href'].encode('utf-8')
           title = article.a['title'].encode('utf-8')
           thumb = article.a.div.img['data-original'].encode('utf-8')
+          xbmcplugin.addSortMethod( handle = addon_handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL )
           addDir(title,url,5,thumb)
 
 def EPISODES(url):
@@ -166,14 +163,6 @@ def get_params():
 def addResolvedLink(name, url, iconimage, dur):
     xbmcplugin.setContent(addon_handle, 'episodes')
     return addItem(name, url, 6, iconimage, dur, False)
-
-def addLink(name,url,iconimage,popis):
-    ok=True
-    liz=xbmcgui.ListItem(name, iconImage="DefaultVideo.png", thumbnailImage=iconimage)
-    liz.setInfo( type="Video", infoLabels={ "Title": name, "Plot": popis} )
-    liz.setProperty( "Fanart_Image", fanart )
-    ok=xbmcplugin.addDirectoryItem(handle=addon_handle,url=url,listitem=liz)
-    return ok
     
 def addItem(name, url, mode, iconimage, dur, isfolder):  
     u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
@@ -212,15 +201,17 @@ except:
 
 logDbg("Mode: "+str(mode))
 logDbg("URL: "+str(url))
-#print "Name: "+str(name)
+logDbg("Name: "+str(name))
 
 if mode==None or url==None or len(url)<1:
     OBSAH()
 elif mode==2:
     HOME_POSLEDNI(url)
 elif mode==3:
+    xbmcplugin.setContent(addon_handle, 'tvshows')
     HOME_TOPPORADY(url)
 elif mode==4:
+    xbmcplugin.setContent(addon_handle, 'tvshows')
     SHOWS(url)
 elif mode==5:
     EPISODES(url)

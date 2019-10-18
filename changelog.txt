@@ -1,3 +1,7 @@
+v1.0.20 (18.10.2019)
+- Zobrazení pořadů v režimu seriál
+- Abecední řazení pořadů
+
 v1.0.19 (2019-10-01)
 - HTTPS
 - Oprava kategorií
@@ -5,6 +9,7 @@ v1.0.19 (2019-10-01)
 - Přidán čas videa do seznamu
 - Přímé přehrávání videí
 - Automatický výběr nejvyšší kvality videa
+
 2019-05-20
  * Oprava prehravani nekterych poradu bez popisu dilu
 2019-05-01
