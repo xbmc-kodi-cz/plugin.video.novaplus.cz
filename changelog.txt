@@ -1,3 +1,6 @@
+v1.0.21 (19.10.2019)
+- Oprava zdvojení položek v pořadech
+
 v1.0.20 (18.10.2019)
 - Zobrazení pořadů v režimu seriál
 - Abecední řazení pořadů

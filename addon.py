@@ -34,44 +34,43 @@ def HOME_POSLEDNI(url):
     doc = read_page(url)
    
     for section in doc.findAll('section', 'b-main-section b-section-articles my-5'):
-        if section.h3.getText(" ").encode('utf-8') == 'POSLEDNÍ DÍLY':
-            #print section.div.h3.getText(" ").encode('utf-8')
-            for article in section.div.findAll('article'):
-                url = article.a['href'].encode('utf-8')
-                title = article.a['title'].encode('utf-8')
-                #title2 = article.find('span', 'e-text').getText(" ").encode('utf-8')
-                thumb = article.a.div.img['data-original'].encode('utf-8')
-                dur=article.find('span', {'class': 'e-duration'}).text
-                if dur and ':' in dur:
-                    l = dur.strip().split(':')
-                    duration = 0
-                    for pos, value in enumerate(l[::-1]):
-                        duration += int(value) * 60 ** pos
-                addResolvedLink(title,url,thumb,duration)
+        for article in section.div.findAll('article'):
+            url = article.a['href'].encode('utf-8')
+            title = article.a['title'].encode('utf-8')
+            #title2 = article.find('span', 'e-text').getText(" ").encode('utf-8')
+            thumb = article.a.div.img['data-original'].encode('utf-8')
+            dur=article.find('span', {'class': 'e-duration'}).text
+            if dur and ':' in dur:
+                l = dur.strip().split(':')
+                duration = 0
+                for pos, value in enumerate(l[::-1]):
+                    duration += int(value) * 60 ** pos
+            addResolvedLink(title,url,thumb,duration)
 
 def HOME_TOPPORADY(url):
     doc = read_page(url)
 
     for section in doc.findAll('section', 'b-main-section my-sm-5'):
-        if section.div.h3.getText(" ").encode('utf-8') == 'TOP POŘADY':
-            for article in section.findAll('article'):
-                url = article.a['href'].encode('utf-8')
-                title = article.a['title'].encode('utf-8')
-                thumb = article.a.div.img['data-original'].encode('utf-8')
-                addDir(title,url,5,thumb)
+        for article in section.findAll('article'):
+            url = article.a['href'].encode('utf-8')
+            title = article.a['title'].encode('utf-8')
+            thumb = article.a.div.img['data-original'].encode('utf-8')
+            addDir(title,url,5,thumb)
 
 def SHOWS(url):
     logDbg('CATEGORIES *********************************' + str(url))
     doc = read_page(url)
-
-    for article in doc.findAll('article'):
+    xbmcplugin.addSortMethod( handle = addon_handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL )
+    shows = doc.find("div", {"class": "b-show-listing"})
+    logDbg(shows)
+    for article in shows.findAll('article'):
+        logDbg(article)
         url, title, thumb = None, None, None
 
         if article.a is not None:
           url = article.a['href'].encode('utf-8')
           title = article.a['title'].encode('utf-8')
           thumb = article.a.div.img['data-original'].encode('utf-8')
-          xbmcplugin.addSortMethod( handle = addon_handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL )
           addDir(title,url,5,thumb)
 
 def EPISODES(url):
