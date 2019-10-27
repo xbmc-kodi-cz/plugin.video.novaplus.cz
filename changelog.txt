@@ -1,3 +1,6 @@
+v1.0.22 (27.10.2019)
+- Oprava poslední pořady
+
 v1.0.21 (19.10.2019)
 - Oprava zdvojení položek v pořadech
 
