@@ -11,8 +11,6 @@ addon = xbmcaddon.Addon('plugin.video.novaplus.cz')
 profile = xbmc.translatePath(addon.getAddonInfo('profile'))
 __settings__ = xbmcaddon.Addon(id='plugin.video.novaplus.cz')
 home = __settings__.getAddonInfo('path')
-#icon = xbmc.translatePath( os.path.join( home, 'icon.png' ) )
-#fanart = xbmc.translatePath( os.path.join( home, 'fanart.jpg' ) )
 
 addon_handle = int(sys.argv[1])
 
@@ -25,10 +23,10 @@ def logDbg(msg):
     log(msg,level=xbmc.LOGDEBUG)
 
 def OBSAH():
-    addDir('Poslední díly','https://novaplus.nova.cz',2,'')
-    addDir('TOP pořady','https://novaplus.nova.cz',3,'')
-    addDir('Všechny pořady','https://novaplus.nova.cz/porady/',4,'')
-    addDir('Televizní noviny','https://novaplus.nova.cz/porad/televizni-noviny',5,'')
+    addDir('Poslední díly','https://novaplus.nova.cz',2,)
+    addDir('TOP pořady','https://novaplus.nova.cz',3)
+    addDir('Všechny pořady','https://novaplus.nova.cz/porady/',4)
+    addDir('Televizní noviny','https://novaplus.nova.cz/porad/televizni-noviny',5)
 
 def HOME_POSLEDNI(url):
     doc = read_page(url)
@@ -38,7 +36,7 @@ def HOME_POSLEDNI(url):
             for article in section.div.findAll('article'):
                 url = article.a['href'].encode('utf-8')
                 title = article.a['title'].encode('utf-8')
-                #title2 = article.find('span', 'e-text').getText(" ").encode('utf-8')
+               
                 thumb = article.a.div.img['data-original'].encode('utf-8')
                 dur=article.find('span', {'class': 'e-duration'}).text
                 if dur and ':' in dur:
@@ -64,42 +62,39 @@ def SHOWS(url):
     doc = read_page(url)
     xbmcplugin.addSortMethod( handle = addon_handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL )
     shows = doc.find("div", {"class": "b-show-listing"})
-    logDbg(shows)
     for article in shows.findAll('article'):
-        logDbg(article)
-        url, title, thumb = None, None, None
-
-        if article.a is not None:
-          url = article.a['href'].encode('utf-8')
-          title = article.a['title'].encode('utf-8')
-          thumb = article.a.div.img['data-original'].encode('utf-8')
-          addDir(title,url,5,thumb)
+        for link in article.findAll('a', href=re.compile(r'novaplus\.nova\.cz') ):
+            url, title, thumb = None, None, None
+            url = link['href'].encode('utf-8')
+            title = link['title'].encode('utf-8')
+            thumb = link.div.img['data-original'].encode('utf-8')
+            addDir(title,url,5,thumb)
 
 def EPISODES(url):
     logDbg('EPISODES *********************************' + str(url))
 
     doc = read_page(url)
     
-    article = doc.find('article', 'b-article b-article-main mb-5')
-    title=article.find('h3', {"class": "e-title"}).text
+    articles = doc.find('div', 'col-md-12 col-lg-8 order-3')
+    title=doc.find('title').text
     url=doc.find('link', rel='canonical')
     thumb=doc.find('meta', property='og:image')
     logDbg("**********************************************"+url['href'])
     
-    addResolvedLink(title.encode('utf-8'),url['href'].encode('utf-8'),thumb['content'].encode('utf-8'), 0)
+    addResolvedLink(title.split(" | ")[0].encode('utf-8'),url['href'].encode('utf-8'),thumb['content'].encode('utf-8'), 0)
 
     # dalsi dily poradu
-    for article in doc.findAll('article', 'b-article b-article-no-labels'):
+    for article in articles.findAll('article', 'b-article-news'):
         url = article.a['href'].encode('utf-8')
         title = article.a['title'].encode('utf-8')
-        thumb = article.a.div.img['data-original'].encode('utf-8')
-        dur=article.find('span', {'class': 'e-duration'}).text
+        thumb = article.a.img['data-original'].encode('utf-8')
+        '''dur=article.find('span', {'class': 'e-duration'}).text
         if dur and ':' in dur:
             l = dur.strip().split(':')
             duration = 0
             for pos, value in enumerate(l[::-1]):
-                duration += int(value) * 60 ** pos
-        addResolvedLink(title,url,thumb,duration)
+                duration += int(value) * 60 ** pos'''
+        addResolvedLink(title,url,thumb,'')
 
 def VIDEOLINK(url):
     logDbg('VIDEOLINK *********************************' + str(url))
@@ -178,7 +173,7 @@ def addItem(name, url, mode, iconimage, dur, isfolder):
     ok=xbmcplugin.addDirectoryItem( handle = addon_handle,url=u,listitem=liz,isFolder=isfolder )
     return ok
 
-def addDir(name,url,mode,iconimage):
+def addDir(name,url,mode,iconimage=''):
     return addItem(name, url, mode, iconimage, 0, True)
 
 params=get_params()
