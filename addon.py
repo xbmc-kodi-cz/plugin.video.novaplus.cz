@@ -37,7 +37,7 @@ def HOME_POSLEDNI(url):
                 url = article.a['href'].encode('utf-8')
                 title = article.a['title'].encode('utf-8')  
                 thumb = article.a.div.img['data-original'].encode('utf-8')
-                dur=article.find('span', {'class': 'e-duration'}).text     
+                dur=article.find('span', {'class': 'e-duration'}).text
                 if dur and ':' in dur:
                     l = dur.strip().split(':')
                     duration = 0
