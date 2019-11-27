@@ -35,10 +35,9 @@ def HOME_POSLEDNI(url):
         if section.h3.getText(" ").encode('utf-8') == 'POSLEDNÍ DÍLY':
             for article in section.div.findAll('article'):
                 url = article.a['href'].encode('utf-8')
-                title = article.a['title'].encode('utf-8')
-               
+                title = article.a['title'].encode('utf-8')  
                 thumb = article.a.div.img['data-original'].encode('utf-8')
-                dur=article.find('span', {'class': 'e-duration'}).text
+                dur=article.find('span', {'class': 'e-duration'}).text     
                 if dur and ':' in dur:
                     l = dur.strip().split(':')
                     duration = 0
@@ -75,7 +74,7 @@ def EPISODES(url):
 
     doc = read_page(url)
     
-    articles = doc.find('div', 'col-md-12 col-lg-8 order-3')
+    articles = doc.find('section', 'b-main-section b-section-articles my-5')
     title=doc.find('title').text
     url=doc.find('link', rel='canonical')
     thumb=doc.find('meta', property='og:image')
@@ -84,17 +83,17 @@ def EPISODES(url):
     addResolvedLink(title.split(" | ")[0].encode('utf-8'),url['href'].encode('utf-8'),thumb['content'].encode('utf-8'), 0)
 
     # dalsi dily poradu
-    for article in articles.findAll('article', 'b-article-news'):
+    for article in articles.findAll('article', 'b-article b-article-no-labels'):
         url = article.a['href'].encode('utf-8')
         title = article.a['title'].encode('utf-8')
         thumb = article.a.img['data-original'].encode('utf-8')
-        '''dur=article.find('span', {'class': 'e-duration'}).text
+        dur=article.find('span', {'class': 'e-duration'}).text
         if dur and ':' in dur:
             l = dur.strip().split(':')
             duration = 0
             for pos, value in enumerate(l[::-1]):
-                duration += int(value) * 60 ** pos'''
-        addResolvedLink(title,url,thumb,'')
+                duration += int(value) * 60 ** pos
+        addResolvedLink(title,url,thumb,duration)
 
 def VIDEOLINK(url):
     logDbg('VIDEOLINK *********************************' + str(url))
