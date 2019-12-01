@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.novaplus.cz"
        name="Nova Plus"
-       version="1.0.25"
+       version="1.0.26"
        provider-name="Jiri Vyhnalek, wombat">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -26,6 +26,9 @@
     </description>
     <source>https://github.com/kodi-czsk/plugin.video.dmd-czech.novaplus</source>
     <news>
+v1.0.26 (01.12.2019)
+- Úpravy po změnách na webu novaplus.cz
+
 v1.0.25 (26.11.2019)
 - Úpravy po změnách na webu novaplus.cz
 
