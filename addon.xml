@@ -95,8 +95,8 @@
      * Nova Plus (alpha) - first release
     </news>
     <assets>
-        <fanart>resources/fanart.png</fanart>
         <icon>resources/icon.png</icon>
+        <fanart>resources/fanart.jpg</fanart>
     </assets>
   </extension>
 </addon>
