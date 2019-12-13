@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" version="1.0.28" provider-name="Jiri Vyhnalek, wombat">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" version="1.0.29" provider-name="Jiri Vyhnalek, wombat">
   <requires>
     <import addon="xbmc.python" version="2.25.0"/>
     <import addon="script.module.requests"/>
@@ -16,6 +16,9 @@
     <platform>all</platform>
     <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
     <news>
+    v1.0.29 (14.12.2019)
+    - Drobné změny
+    
     v1.0.28 (13.12.2019)
     - Změna min. závislosti Kodi 17+
     
