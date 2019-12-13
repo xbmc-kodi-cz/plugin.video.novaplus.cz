@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 import urllib2,urllib,re,os,string,time,base64,datetime
-
-from parseutils import *
+from bs4 import BeautifulSoup
+import requests
+import json
 import xbmcplugin,xbmcgui,xbmcaddon
 
-__baseurl__ = 'http://novaplus.nova.cz'
-__dmdbase__ = 'http://iamm.uvadi.cz/xbmc/voyo/'
-_UserAgent_ = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'
+_baseurl_ = 'https://novaplus.nova.cz/'
+_useragent_ = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36'
 addon = xbmcaddon.Addon('plugin.video.novaplus.cz')
-profile = xbmc.translatePath(addon.getAddonInfo('profile'))
-__settings__ = xbmcaddon.Addon(id='plugin.video.novaplus.cz')
-home = __settings__.getAddonInfo('path')
 
 addon_handle = int(sys.argv[1])
 
@@ -22,139 +19,122 @@ def log(msg, level=xbmc.LOGDEBUG):
 def logDbg(msg):
     log(msg,level=xbmc.LOGDEBUG)
 
-def OBSAH():
-    addDir('Poslední díly','https://novaplus.nova.cz',2,)
-    addDir('TOP pořady','https://novaplus.nova.cz',3)
-    addDir('Všechny pořady','https://novaplus.nova.cz/porady/',4)
-    addDir('Televizní noviny','https://novaplus.nova.cz/porad/televizni-noviny',5)
+def fetch(url):
+    logDbg("fetchUrl " + url)
+    httpdata = ''
+    try:
+        request = urllib2.Request(url, headers={'User-Agent': _useragent_})
+        resp = urllib2.urlopen(request)
+        httpdata = resp.read().decode('utf-8')
+    except:
+        httpdata = None
+    finally:
+        resp.close() 
+    return BeautifulSoup(httpdata, 'html.parser')
 
-def HOME_POSLEDNI(url):
-    doc = read_page(url)
-   
-    for section in doc.findAll('section', 'b-main-section b-section-articles my-5'):
-        if section.h3.getText(" ").encode('utf-8') == 'POSLEDNÍ DÍLY':
-            for article in section.div.findAll('article'):
-                url = article.a['href'].encode('utf-8')
-                title = article.a['title'].encode('utf-8')  
-                thumb = article.a.div.img['data-original'].encode('utf-8')
-                dur=article.find('span', {'class': 'e-duration'}).text
-                if dur and ':' in dur:
-                    l = dur.strip().split(':')
-                    duration = 0
-                    for pos, value in enumerate(l[::-1]):
-                        duration += int(value) * 60 ** pos
-                addResolvedLink(title,url,thumb,duration)
+def CONTENT():
+    addDir('Všechny pořady', _baseurl_+"porady", 4)
+    doc = fetch(_baseurl_)
+    for section in doc.findAll('section', 'b-main-section'):
+        if section.find('h3'):
+            title=section.find('h3').text
+            title=title[0].upper()+title[1:].lower()
+            if section['class'][1] == 'b-section-articles':
+                addDir(title, _baseurl_, 7)
+            else:
+                addDir(title, _baseurl_, 8)
 
-def HOME_TOPPORADY(url):
-    doc = read_page(url)
-
-    for section in doc.findAll('section', 'b-main-section my-sm-5'):
-        if section.div.h3.getText(" ").encode('utf-8') == 'TOP POŘADY':
+def ITEMS(title, dir=False):
+    doc = fetch(_baseurl_)
+    if dir == False:
+        sections = doc.findAll('section', 'b-main-section b-section-articles my-5')
+    else:
+        sections = doc.findAll('section', 'b-main-section my-sm-5')
+    
+    for section in sections:
+        if section.find('h3').text == title.decode("utf-8").upper():
             for article in section.findAll('article'):
-                url = article.a['href'].encode('utf-8')
-                title = article.a['title'].encode('utf-8')
-                thumb = article.a.div.img['data-original'].encode('utf-8')
-                addDir(title,url,5,thumb)
+                url = article.a['href']
+                title = article.a['title']
+                thumb = article.a.div.img['data-original']
+                
+                if dir == False:
+                    try:
+                        dur=article.find('span', {'class': 'e-duration'}).text
+                        if dur and ':' in dur:
+                            l = dur.strip().split(':')
+                            duration = 0
+                            for pos, value in enumerate(l[::-1]):
+                                duration += int(value) * 60 ** pos
+                    except:
+                        duration=None
+                    print duration
+                    addResolvedLink(title, url, thumb, duration)
+                else:
+                    xbmcplugin.setContent(addon_handle, 'tvshows')
+                    addDir(title, url, 5, thumb)
 
 def SHOWS(url):
-    logDbg('CATEGORIES *********************************' + str(url))
-    doc = read_page(url)
+    logDbg('SHOWS *********************************' + str(url))
+    doc = fetch(url)
     xbmcplugin.addSortMethod( handle = addon_handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL )
     shows = doc.find("div", {"class": "b-show-listing"})
     for article in shows.findAll('article'):
         for link in article.findAll('a', href=re.compile(r'novaplus\.nova\.cz') ):
             url, title, thumb = None, None, None
-            url = link['href'].encode('utf-8')
-            title = link['title'].encode('utf-8')
-            thumb = link.div.img['data-original'].encode('utf-8')
+            url = link['href']
+            title = link['title']
+            thumb = link.div.img['data-original']
             addDir(title,url,5,thumb)
 
 def EPISODES(url):
     logDbg('EPISODES *********************************' + str(url))
 
-    doc = read_page(url)
-    data = []
+    doc = fetch(url)
     
-    try:
-        section = doc.find('section', 'b-main-section b-section-articles my-5')
-        data = section.findAll('article', 'b-article b-article-no-labels')
-    except:
-        pass
-    
-    if len(data) == 0: 
-        try:
-            section = doc.find('div', 'col-md-12 col-lg-8 order-3')
-            data = section.findAll('article', 'b-article-news')
-        except:
-            pass
-        
-    title=doc.find('title').text
-    url=doc.find('link', rel='canonical')
-    thumb=doc.find('meta', property='og:image')
-    logDbg("**********************************************"+url['href'])
-    
-    addResolvedLink(title.split(" | ")[0].encode('utf-8'),url['href'].encode('utf-8'),thumb['content'].encode('utf-8'), 0)
-
-    # dalsi dily poradu
-    for article in data:
-        #logDbg(article)
-        #if section.div.h3.getText(" ").encode('utf-8') == 'CELÉ DÍLY':
-        url = article.a['href'].encode('utf-8')
-        title = article.a['title'].encode('utf-8')
-        thumb = article.a.img['data-original'].encode('utf-8')
-        try:
-            dur=article.find('span', {'class': 'e-duration'}).text
-            if dur and ':' in dur:
-                l = dur.strip().split(':')
-                duration = 0
-                for pos, value in enumerate(l[::-1]):
-                    duration += int(value) * 60 ** pos
-        except:
-            duration=''
-        addResolvedLink(title,url,thumb, duration)
+    for article in doc.findAll('article', 'b-article-news m-layout-playlist'):
+        label=article.find('a', {'class': 'e-label bg'})
+        if label:
+            if label.text == 'Celé díly':
+                url = article.a['href']
+                title = article.find('h3').text
+                thumb = article.a.img['data-original']
+                try:
+                    dur=article.find('span', {'class': 'e-duration'}).text
+                    if dur and ':' in dur:
+                        l = dur.strip().split(':')
+                        duration = 0
+                        for pos, value in enumerate(l[::-1]):
+                            duration += int(value) * 60 ** pos
+                except:
+                    duration=None
+                addResolvedLink(title, url, thumb, duration)
 
 def VIDEOLINK(url):
     logDbg('VIDEOLINK *********************************' + str(url))
 
-    doc = read_page(url)
+    doc = fetch(url)
 
     # zjisteni nazvu a popisu aktualniho dilu
-    article = doc.find('article', 'b-article b-article-main')
-    # nazev
-    name = article.find('h3').getText(" ").encode('utf-8')
-    # popis nemusi byt vzdy uveden
-    try:
-      desc = article.find('div', 'e-description').getText(" ").encode('utf-8')
-    except:
-      desc = ''
-
+    title = doc.find("meta", property="og:title")
+    desc = doc.find("meta", property="og:description")
+    
     # nalezeni iframe
     main = doc.find('main')
     url = main.find('iframe')['src']
     logDbg(' - iframe src ' + str(url))
+    
+    scripts = fetch(url)
+    script = scripts.find_all('script')
+    
+    stream = script[-1].text.replace("\r","").replace("\n","").replace("\t","")
+    bitrates = re.compile('src = {(.+?)\[(.+?)\]').findall(stream);
 
-    # nacteni a zpracovani iframe
-    req = urllib2.Request(url)
-    req.add_header('User-Agent', _UserAgent_)
-    response = urllib2.urlopen(req)
-    httpdata = response.read()
-    response.close()
-
-    httpdata   = httpdata.replace("\r","").replace("\n","").replace("\t","")
-
-    thumb = re.compile('<meta property="og:image" content="(.+?)">').findall(httpdata)
-    thumb = thumb[0] if len(thumb) > 0 else ''
-
-    bitrates = re.compile('src = {(.+?)\[(.+?)\]').findall(httpdata);
     if len(bitrates) > 0:
         urls = re.compile('[\'\"](.+?)[\'\"]').findall(bitrates[0][1])
-        liz = xbmcgui.ListItem()
-        liz = xbmcgui.ListItem(path=urls[-1])  
-        liz.setInfo( type="Video", infoLabels={ "Title": name, 'Plot': desc})
-        liz.setProperty('isPlayable', 'true')
+        liz = xbmcgui.ListItem(path=urls[-1])
+        liz.setInfo( type='video', infoLabels={ 'title': title[u"content"], 'plot': desc[u"content"]})
         xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=liz)
-    else:
-        xbmcgui.Dialog().ok('Chyba', 'Video nelze přehrát', '', '')
 
 def get_params():
     param=[]
@@ -173,29 +153,27 @@ def get_params():
                 param[splitparams[0]]=splitparams[1]
     return param
 
-def addResolvedLink(name, url, iconimage, dur):
+def addResolvedLink(title, url, iconimage, duration):
     xbmcplugin.setContent(addon_handle, 'episodes')
-    return addItem(name, url, 6, iconimage, dur, False)
+    return addItem(title, url, 6, iconimage, duration, False)
     
-def addItem(name, url, mode, iconimage, dur, isfolder):  
-    u=sys.argv[0]+"?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)
+def addItem(title, url, mode, iconimage, duration, isfolder):  
+    u=sys.argv[0]+"?url="+urllib.quote_plus(url.encode('utf-8'))+"&mode="+str(mode)+"&title="+urllib.quote_plus(title.encode('utf-8'))
     ok=True
-    liz=xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=iconimage)
-    liz.setInfo(type="Video", infoLabels={"Title": name})
-    liz.setProperty("Fanart_Image", iconimage)
-    if u'dur':
-        liz.setInfo('video', {'duration': dur})
+    liz=xbmcgui.ListItem(title, iconImage="DefaultFolder.png", thumbnailImage=iconimage)
+    liz.setInfo('video', infoLabels={'mediatype': 'episode', 'title': title, 'duration': duration})
+    liz.setProperty("fanart_image", iconimage)
     if not isfolder:
-        liz.setProperty("isPlayable", "true")
+        liz.setProperty('isPlayable', 'true')
     ok=xbmcplugin.addDirectoryItem( handle = addon_handle,url=u,listitem=liz,isFolder=isfolder )
     return ok
 
-def addDir(name,url,mode,iconimage=''):
-    return addItem(name, url, mode, iconimage, 0, True)
+def addDir(title,url,mode,iconimage='', isfolder=True):
+    return addItem(title, url, mode, iconimage, None, True)
 
 params=get_params()
 url=None
-name=None
+title=None
 thumb=None
 mode=None
 
@@ -204,7 +182,7 @@ try:
 except:
     pass
 try:
-    name=urllib.unquote_plus(params["name"])
+    title=urllib.unquote_plus(params["title"])
 except:
     pass
 try:
@@ -214,15 +192,10 @@ except:
 
 logDbg("Mode: "+str(mode))
 logDbg("URL: "+str(url))
-logDbg("Name: "+str(name))
+logDbg("Title: "+str(title))
 
 if mode==None or url==None or len(url)<1:
-    OBSAH()
-elif mode==2:
-    HOME_POSLEDNI(url)
-elif mode==3:
-    xbmcplugin.setContent(addon_handle, 'tvshows')
-    HOME_TOPPORADY(url)
+    CONTENT()
 elif mode==4:
     xbmcplugin.setContent(addon_handle, 'tvshows')
     SHOWS(url)
@@ -230,5 +203,9 @@ elif mode==5:
     EPISODES(url)
 elif mode==6:
     VIDEOLINK(url)
+elif mode==7:
+    ITEMS(title)
+elif mode==8:
+    ITEMS(title, True)
 
 xbmcplugin.endOfDirectory(addon_handle)

@@ -1,103 +1,102 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.novaplus.cz"
-       name="Nova Plus"
-       version="1.0.26"
-       provider-name="Jiri Vyhnalek, wombat">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" version="1.0.27" provider-name="Jiri Vyhnalek, wombat">
   <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.dmd-czech.common" version="1.5.5"/>
+    <import addon="xbmc.python" version="2.26.0"/>
+    <import addon="script.module.requests"/>
+    <import addon="script.module.beautifulsoup4"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Nova Plus - online televize TV Nova</summary>
+    <summary lang="cs_CZ">Nova Plus - online televize TV Nova</summary>
+    <description lang="en_GB">Vaše oblíbené seriály, pořady a živé vysílání TV Nova na online televizi Nova Plus, které si pustíte, kdy chcete vy.</description>
+    <description lang="cs_CZ">Vaše oblíbené seriály, pořady a živé vysílání TV Nova na online televizi Nova Plus, které si pustíte, kdy chcete vy.</description>
     <platform>all</platform>
-    <summary>Nova Plus TV video-archive plugin</summary>
-    <summary lang="cs">Nova Plus - online televize TV Nova</summary>
-    <summary lang="sk">Nova Plus - online televize TV Nova</summary>
-    <description>
-        Plugin to play TV video archive Novaplus.nova.cz
-    </description>
-    <description lang="cs">
-        Plugin pro přehrávání videí z archivu Novaplus.nova.cz
-    </description>
-    <description lang="sk">
-        Plugin na prehrávanie videí z archívu Novaplus.nova.cz
-    </description>
-    <source>https://github.com/kodi-czsk/plugin.video.dmd-czech.novaplus</source>
+    <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
     <news>
-v1.0.26 (01.12.2019)
-- Úpravy po změnách na webu novaplus.cz
+    v1.0.27 (13.12.2019)
+    - Úpravy po změnách na webu novaplus.cz
+    - Pročištění kódu
+    - Zrušení některých závislosti
 
-v1.0.25 (26.11.2019)
-- Úpravy po změnách na webu novaplus.cz
+    v1.0.26 (01.12.2019)
+    - Úpravy po změnách na webu novaplus.cz
 
-v1.0.24 (26.11.2019)
-- Úpravy po změnách na webu novaplus.cz
+    v1.0.25 (26.11.2019)
+    - Úpravy po změnách na webu novaplus.cz
 
-v1.0.23 (24.11.2019)
-- Úpravy po změnách na webu novaplus.cz
-- Zobrazení pouze pořadů k přehrání
+    v1.0.24 (26.11.2019)
+    - Úpravy po změnách na webu novaplus.cz
 
-v1.0.22 (27.10.2019)
-- Oprava poslední pořady
+    v1.0.23 (24.11.2019)
+    - Úpravy po změnách na webu novaplus.cz
+    - Zobrazení pouze pořadů k přehrání
 
-v1.0.21 (19.10.2019)
-- Oprava zdvojení položek v pořadech
+    v1.0.22 (27.10.2019)
+    - Oprava poslední pořady
 
-v1.0.20 (18.10.2019)
-- Zobrazení pořadů v režimu seriál
-- Abecední řazení pořadů
+    v1.0.21 (19.10.2019)
+    - Oprava zdvojení položek v pořadech
 
-v1.0.19 (2019-10-01)
-- HTTPS
-- Oprava kategorií
-- Přechod na režim seznamu epizod
-- Přidán čas videa do seznamu
-- Přímé přehrávání videí
-- Automatický výběr nejvyšší kvality videa
+    v1.0.20 (18.10.2019)
+    - Zobrazení pořadů v režimu seriál
+    - Abecední řazení pořadů
 
-2019-05-20
- * Oprava prehravani nekterych poradu bez popisu dilu
-2019-05-01
- * Oprava seznamu poradu
-2019-03-14
- * Zmena na webu Nova Plus (odkaz na porad vede rovnou na nejnovejsi dil)
-2019-01-16
- * Oprava seznamu epizod poradu
-2018-11-20
- * Oprava doplnku po zmene stranek Nova Plus (seznam epizod poradu)
-2018-11-16
- * Oprava doplnku po zmene stranek Nova Plus
-2018-09-17
- * Doplneni dalsich dilu (z Nova Gold) v serialech
-2018-08-14
- * Oprava doplnku po zmene stranek Nova Plus
-2017-11-26
- * Nová ikona
-2017-09-24
- * Oprava prehravani videi po zmene stranek Nova Plus
-2017-07-05
- * Oprava zobrazenia vsetkych dielov v poradoch a serialoch
-2017-04-29
- * Oprava prehravani
-2016-05-20
- * Oprava prehravani
- * Oprava nahledu poradu
- * Zmena nazvu hlavniho adresare na Nejsledovanejsi
- * Update grafiky dle aktualniho vzhledu stranek Nova Plus
-2015-11-21
- * Oprava prehravani
-2015-06-11
- * Oprava prehravani
-2014-10-25
- * Pridani statistik
-2014-08-12
- * Oprava nacitani kategorii
-2014-03-15
- * Oprava prehravani
-2014-02-04:
- * Nova Plus (alpha) - first release
+    v1.0.19 (2019-10-01)
+    - HTTPS
+    - Oprava kategorií
+    - Přechod na režim seznamu epizod
+    - Přidán čas videa do seznamu
+    - Přímé přehrávání videí
+    - Automatický výběr nejvyšší kvality videa
+
+    2019-05-20
+     * Oprava prehravani nekterych poradu bez popisu dilu
+    2019-05-01
+     * Oprava seznamu poradu
+    2019-03-14
+     * Zmena na webu Nova Plus (odkaz na porad vede rovnou na nejnovejsi dil)
+    2019-01-16
+     * Oprava seznamu epizod poradu
+    2018-11-20
+     * Oprava doplnku po zmene stranek Nova Plus (seznam epizod poradu)
+    2018-11-16
+     * Oprava doplnku po zmene stranek Nova Plus
+    2018-09-17
+     * Doplneni dalsich dilu (z Nova Gold) v serialech
+    2018-08-14
+     * Oprava doplnku po zmene stranek Nova Plus
+    2017-11-26
+     * Nová ikona
+    2017-09-24
+     * Oprava prehravani videi po zmene stranek Nova Plus
+    2017-07-05
+     * Oprava zobrazenia vsetkych dielov v poradoch a serialoch
+    2017-04-29
+     * Oprava prehravani
+    2016-05-20
+     * Oprava prehravani
+     * Oprava nahledu poradu
+     * Zmena nazvu hlavniho adresare na Nejsledovanejsi
+     * Update grafiky dle aktualniho vzhledu stranek Nova Plus
+    2015-11-21
+     * Oprava prehravani
+    2015-06-11
+     * Oprava prehravani
+    2014-10-25
+     * Pridani statistik
+    2014-08-12
+     * Oprava nacitani kategorii
+    2014-03-15
+     * Oprava prehravani
+    2014-02-04:
+     * Nova Plus (alpha) - first release
     </news>
+    <assets>
+        <fanart>resources/fanart.png</fanart>
+        <icon>resources/icon.png</icon>
+    </assets>
   </extension>
 </addon>
