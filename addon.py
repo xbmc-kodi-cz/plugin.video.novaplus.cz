@@ -10,14 +10,15 @@ import xbmcaddon
 
 _baseurl_ = 'https://novaplus.nova.cz/'
 _useragent_ = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36'
-addon = xbmcaddon.Addon('plugin.video.novaplus.cz')
+_addon = xbmcaddon.Addon('plugin.video.novaplus.cz')
+_lang = _addon.getLocalizedString
 
 addon_handle = int(sys.argv[1])
 
 def log(msg, level=xbmc.LOGDEBUG):
     if type(msg).__name__ == 'unicode':
         msg = msg.encode('utf-8')
-    xbmc.log("[%s] %s" % (addon, msg.__str__()), level)
+    xbmc.log("[%s] %s" % (_addon, msg.__str__()), level)
 
 def logDbg(msg):
     log(msg,level=xbmc.LOGDEBUG)
@@ -28,7 +29,7 @@ def fetch(url):
     return BeautifulSoup(resp.content, 'html.parser')
 
 def CONTENT():
-    addDir('Všechny pořady', _baseurl_+"porady", 4)
+    addDir(_lang(30001), _baseurl_+"porady", 4)
     doc = fetch(_baseurl_)
     for section in doc.find_all('section', 'b-main-section'):
         if section.find('h3'):

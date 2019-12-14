@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" version="1.0.30" provider-name="Jiri Vyhnalek, wombat">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.0.31">
   <requires>
-    <import addon="xbmc.python" version="2.25.0"/>
-    <import addon="script.module.requests"/>
-    <import addon="script.module.beautifulsoup4"/>
+    <import addon="xbmc.python" version="2.25.0" />
+    <import addon="script.module.requests" />
+    <import addon="script.module.beautifulsoup4" />
   </requires>
-  <extension point="xbmc.python.pluginsource" library="addon.py">
+  <extension library="addon.py" point="xbmc.python.pluginsource">
     <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
@@ -16,6 +15,10 @@
     <platform>all</platform>
     <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
     <news>
+    v1.0.31 (14.12.2019)
+    - Přidany jazykové řetězce
+    
+    - Drobné změny
     v1.0.30 (14.12.2019)
     - Drobné změny
     
