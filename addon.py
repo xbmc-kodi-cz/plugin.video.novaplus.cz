@@ -48,7 +48,7 @@ def ITEMS(title, dir=False):
         sections = doc.find_all('section', 'b-main-section my-sm-5')
     
     for section in sections:
-        if section.find('h3').text == title.decode("utf-8").upper():
+        if section.find('h3').text == title.decode("utf-8").upper().encode('utf-8'):
             for article in section.find_all('article'):
                 url = article.a['href']
                 title = article.a['title']
