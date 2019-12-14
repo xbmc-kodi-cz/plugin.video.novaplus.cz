@@ -79,7 +79,7 @@ def SHOWS(url):
             url = link['href']
             title = link['title']
             thumb = link.div.img['data-original']
-            addDir(title,url,5,thumb)
+            addDir(title, url, 5, thumb)
 
 def EPISODES(url):
     logDbg('EPISODES *********************************' + str(url))
@@ -109,11 +109,9 @@ def VIDEOLINK(url):
 
     doc = fetch(url)
 
-    # zjisteni nazvu a popisu aktualniho dilu
     title = doc.find("meta", property="og:title")
     desc = doc.find("meta", property="og:description")
     
-    # nalezeni iframe
     main = doc.find('main')
     url = main.find('iframe')['src']
     logDbg(' - iframe src ' + str(url))
@@ -162,7 +160,7 @@ def addItem(title, url, mode, iconimage, duration, isfolder):
     ok=xbmcplugin.addDirectoryItem( handle = addon_handle,url=u,listitem=liz,isFolder=isfolder )
     return ok
 
-def addDir(title,url,mode,iconimage='', isfolder=True):
+def addDir(title, url, mode, iconimage=None, isfolder=True):
     return addItem(title, url, mode, iconimage, None, True)
 
 params=get_params()
