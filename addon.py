@@ -34,7 +34,6 @@ def CONTENT():
     for section in doc.find_all('section', 'b-main-section'):
         if section.find('h3'):
             title=section.find('h3').text
-            title=title[0].upper()+title[1:].lower().encode('utf-8')
             if section['class'][1] == 'b-section-articles':
                 addDir(title, _baseurl_, 7)
             else:
@@ -48,7 +47,7 @@ def ITEMS(title, dir=False):
         sections = doc.find_all('section', 'b-main-section my-sm-5')
     
     for section in sections:
-        if section.find('h3').text == title.decode("utf-8").upper().encode('utf-8'):
+        if section.find('h3').text == title:
             for article in section.find_all('article'):
                 url = article.a['href']
                 title = article.a['title']
