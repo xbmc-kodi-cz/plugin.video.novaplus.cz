@@ -30,7 +30,7 @@ def fetch(url):
 def CONTENT():
     addDir('Všechny pořady', _baseurl_+"porady", 4)
     doc = fetch(_baseurl_)
-    for section in doc.findAll('section', 'b-main-section'):
+    for section in doc.find_all('section', 'b-main-section'):
         if section.find('h3'):
             title=section.find('h3').text
             title=title[0].upper()+title[1:].lower()
@@ -42,13 +42,13 @@ def CONTENT():
 def ITEMS(title, dir=False):
     doc = fetch(_baseurl_)
     if dir == False:
-        sections = doc.findAll('section', 'b-main-section b-section-articles my-5')
+        sections = doc.find_all('section', 'b-main-section b-section-articles my-5')
     else:
-        sections = doc.findAll('section', 'b-main-section my-sm-5')
+        sections = doc.find_all('section', 'b-main-section my-sm-5')
     
     for section in sections:
         if section.find('h3').text == title.decode("utf-8").upper():
-            for article in section.findAll('article'):
+            for article in section.find_all('article'):
                 url = article.a['href']
                 title = article.a['title']
                 thumb = article.a.div.img['data-original']
@@ -63,7 +63,6 @@ def ITEMS(title, dir=False):
                                 duration += int(value) * 60 ** pos
                     except:
                         duration=None
-                    print duration
                     addResolvedLink(title, url, thumb, duration)
                 else:
                     xbmcplugin.setContent(addon_handle, 'tvshows')
@@ -73,23 +72,23 @@ def SHOWS(url):
     logDbg('SHOWS *********************************' + str(url))
     doc = fetch(url)
     xbmcplugin.addSortMethod( handle = addon_handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL )
-    shows = doc.find("div", {"class": "b-show-listing"})
-    for article in shows.findAll('article'):
-        for link in article.findAll('a', href=re.compile(r'novaplus\.nova\.cz') ):
+    shows = doc.find_all("div", {"class": "b-tiles-wrapper"})
+    for article in shows[1].find_all('article'):
+        for link in article.find_all('a', href=re.compile(r'novaplus\.nova\.cz') ):
             url, title, thumb = None, None, None
             url = link['href']
             title = link['title']
             thumb = link.div.img['data-original']
-            addDir(title, url, 5, thumb)
+            addDir(title,url,5,thumb)
 
 def EPISODES(url):
     logDbg('EPISODES *********************************' + str(url))
-
     doc = fetch(url)
     
-    for article in doc.findAll('article', 'b-article-news m-layout-playlist'):
-        label=article.find('a', {'class': 'e-label bg'})
+    for article in doc.find_all('article', 'b-article-news m-layout-playlist'):
+        label=article.find('', {'class': 'e-label bg'})
         if label:
+
             if label.text == 'Celé díly':
                 url = article.a['href']
                 title = article.find('h3').text
@@ -109,10 +108,12 @@ def VIDEOLINK(url):
     logDbg('VIDEOLINK *********************************' + str(url))
 
     doc = fetch(url)
-    
+
+    # zjisteni nazvu a popisu aktualniho dilu
     title = doc.find("meta", property="og:title")
     desc = doc.find("meta", property="og:description")
     
+    # nalezeni iframe
     main = doc.find('main')
     url = main.find('iframe')['src']
     logDbg(' - iframe src ' + str(url))
@@ -161,7 +162,7 @@ def addItem(title, url, mode, iconimage, duration, isfolder):
     ok=xbmcplugin.addDirectoryItem( handle = addon_handle,url=u,listitem=liz,isFolder=isfolder )
     return ok
 
-def addDir(title,url,mode,iconimage=None, isfolder=True):
+def addDir(title,url,mode,iconimage='', isfolder=True):
     return addItem(title, url, mode, iconimage, None, True)
 
 params=get_params()
