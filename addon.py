@@ -34,7 +34,7 @@ def CONTENT():
     for section in doc.find_all('section', 'b-main-section'):
         if section.find('h3'):
             title=section.find('h3').text
-            title=title[0].upper()+title[1:].lower()
+            title=title[0].upper()+title[1:].lower().encode('utf-8')
             if section['class'][1] == 'b-section-articles':
                 addDir(title, _baseurl_, 7)
             else:
