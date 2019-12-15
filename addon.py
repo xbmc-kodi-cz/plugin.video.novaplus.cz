@@ -32,18 +32,25 @@ def _fetch(url):
 def _thumb(url):
     th_size_w = ''
     th_size_h = ''
-       
+    
     th_size = re.search('r(.+?)x(.+?)n', url)   
     
     if th_size.group(1) == th_size.group(2):
-        th_size_w= 512
-        th_size_h= 512
+        th_size_w = 512
+        th_size_h = 512
     else:
-        th_size_w= 640
-        th_size_h= 362
-        
+        th_size_w = 640
+        th_size_h = 362       
     return re.sub('r(.+?)x(.+?)n', 'r'+str(th_size_w)+'x'+str(th_size_h)+'n', url)
-
+    
+def _dur(dur):
+    if dur and ':' in dur:
+        l = dur.strip().split(':')
+        duration = 0
+        for pos, value in enumerate(l[::-1]):
+            duration += int(value) * 60 ** pos
+    return duration
+    
 def CONTENT():
     addDir(_lang(30001), _baseurl_+'porady', 4)
     doc = _fetch(_baseurl_)
@@ -66,16 +73,7 @@ def ITEMS(title, dir=False):
         if section.find('h3').text == title.decode('utf-8'):
             for article in section.find_all('article'):
                 if dir == False:
-                    try:
-                        dur=article.find('span', {'class': 'e-duration'}).text
-                        if dur and ':' in dur:
-                            l = dur.strip().split(':')
-                            duration = 0
-                            for pos, value in enumerate(l[::-1]):
-                                duration += int(value) * 60 ** pos
-                    except:
-                        duration=None
-                    addResolvedLink(article.a['title'], article.a['href'], _thumb(article.a.div.img['data-original']), duration)
+                    addResolvedLink(article.a['title'], article.a['href'], _thumb(article.a.div.img['data-original']), _dur(article.find('span', {'class': 'e-duration'}).text))
                 else:
                     xbmcplugin.setContent(addon_handle, 'tvshows')
                     addDir(article.a['title'], article.a['href'], 5, _thumb(article.a.div.img['data-original']))
@@ -90,41 +88,18 @@ def SHOWS(url):
 
 def EPISODES(url):
     doc = _fetch(url)
-    
     for article in doc.find_all('article', 'b-article-news m-layout-playlist'):
-        label=article.find('', {'class': 'e-label bg'})
-        if label:
-            if label.text.encode('utf-8') == 'Celé díly':
-                try:
-                    dur=article.find('span', {'class': 'e-duration'}).text
-                    if dur and ':' in dur:
-                        l = dur.strip().split(':')
-                        duration = 0
-                        for pos, value in enumerate(l[::-1]):
-                            duration += int(value) * 60 ** pos
-                except:
-                    duration=None
-                addResolvedLink(article.find('h3').text, article.a['href'], article.a.img['data-original'], duration)
+        if article.find('span', {'class': 'e-label'})["class"][1] != 'voyo':
+            addResolvedLink(article.find('h3').text, article.a['href'], article.a.img['data-original'], _dur(article.find('span', {'class': 'e-duration'}).text))
 
 def VIDEOLINK(url):
     doc = _fetch(url)
-
-    title = doc.find('meta', property='og:title')
-    desc = doc.find('meta', property='og:description')
-    
-    main = doc.find('main')
-    url = main.find('iframe')['src']
-    logDbg(' - iframe src ' + str(url))
-    
-    scripts = _fetch(url)
-    script = scripts.find_all('script')
-    
-    bitrates = re.compile('src = {(.+?)\[(.+?)\]').findall(script[-1].text.replace('\r','').replace('\n','').replace('\t',''));
+    bitrates = re.compile('src = {(.+?)\[(.+?)\]').findall(_fetch(doc.find('main').find('iframe')['src']).find_all('script')[-1].text.replace('\r','').replace('\n','').replace('\t',''));
 
     if len(bitrates) > 0:
         urls = re.compile('[\'\"](.+?)[\'\"]').findall(bitrates[0][1])
         liz = xbmcgui.ListItem(path=urls[-1])
-        liz.setInfo( type='video', infoLabels={ 'title': title[u'content'], 'plot': desc[u'content']})
+        liz.setInfo( type='video', infoLabels={ 'title': doc.find('meta', property='og:title')[u'content'], 'plot': doc.find('meta', property='og:description')[u'content']})
         xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=liz)
 
 def addResolvedLink(title, url, iconimage, duration):

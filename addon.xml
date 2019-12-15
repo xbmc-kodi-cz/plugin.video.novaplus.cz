@@ -1,4 +1,4 @@
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.0.37">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.0.38">
   <requires>
     <import addon="xbmc.python" version="2.25.0" />
     <import addon="script.module.requests" version="2.22.0" />
@@ -15,10 +15,13 @@
     <platform>all</platform>
     <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
     <news>
+    v1.0.38 (15.12.2019)
+    - Drobné změny
+    
     v1.0.37 (15.12.2019)
     - Větší rozlišení náhledů
     
-    v1.0.35 (15.12.2019)
+    v1.0.36 (15.12.2019)
     - Opravy
     
     v1.0.35 (15.12.2019)
@@ -35,8 +38,8 @@
     
     v1.0.31 (14.12.2019)
     - Přidany jazykové řetězce
-    
     - Drobné změny
+    
     v1.0.30 (14.12.2019)
     - Drobné změny
     
@@ -74,7 +77,7 @@
     - Zobrazení pořadů v režimu seriál
     - Abecední řazení pořadů
 
-    v1.0.19 (2019-10-01)
+    v1.0.19 (01.10.2019)
     - HTTPS
     - Oprava kategorií
     - Přechod na režim seznamu epizod
