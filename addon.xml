@@ -1,4 +1,4 @@
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.0.36">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.0.37">
   <requires>
     <import addon="xbmc.python" version="2.25.0" />
     <import addon="script.module.requests" version="2.22.0" />
@@ -15,6 +15,12 @@
     <platform>all</platform>
     <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
     <news>
+    v1.0.37 (15.12.2019)
+    - Větší rozlišení náhledů
+    
+    v1.0.35 (15.12.2019)
+    - Opravy
+    
     v1.0.35 (15.12.2019)
     - Opravy
     
