@@ -33,9 +33,9 @@ def _thumb(url):
     th_size_w = ''
     th_size_h = ''
        
-    th_size = re.search('(\/r(.+?)x(.+?)n\/)', url)   
+    th_size = re.search('r(.+?)x(.+?)n', url)   
     
-    if th_size.group(2) == th_size.group(3):
+    if th_size.group(1) == th_size.group(2):
         th_size_w= 512
         th_size_h= 512
     else:
