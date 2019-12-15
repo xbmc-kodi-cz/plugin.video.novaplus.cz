@@ -78,7 +78,7 @@ def EPISODES(url):
     for article in doc.find_all('article', 'b-article-news m-layout-playlist'):
         label=article.find('', {'class': 'e-label bg'})
         if label:
-            if label.text == 'Celé díly':
+            if label.text.encode('utf-8') == 'Celé díly':
                 try:
                     dur=article.find('span', {'class': 'e-duration'}).text
                     if dur and ':' in dur:
