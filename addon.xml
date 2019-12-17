@@ -1,4 +1,4 @@
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.0.38">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.0.39">
   <requires>
     <import addon="xbmc.python" version="2.25.0" />
     <import addon="script.module.requests" version="2.22.0" />
@@ -15,75 +15,78 @@
     <platform>all</platform>
     <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
     <news>
-    v1.0.38 (15.12.2019)
-    - Drobné změny
-    
-    v1.0.37 (15.12.2019)
-    - Větší rozlišení náhledů
-    
-    v1.0.36 (15.12.2019)
-    - Opravy
-    
-    v1.0.35 (15.12.2019)
-    - Opravy
-    
-    v1.0.34 (14.12.2019)
-    - Opravy kódování
-    
-    v1.0.33 (14.12.2019)
-    - Opravy kódování
-    
-    v1.0.32 (14.12.2019)
-    - Opravy kódování
-    
-    v1.0.31 (14.12.2019)
-    - Přidany jazykové řetězce
-    - Drobné změny
-    
-    v1.0.30 (14.12.2019)
-    - Drobné změny
-    
-    v1.0.29 (14.12.2019)
-    - Drobné změny
-    
-    v1.0.28 (13.12.2019)
-    - Změna min. závislosti Kodi 17+
-    
-    v1.0.27 (13.12.2019)
-    - Úpravy po změnách na webu novaplus.cz
-    - Pročištění kódu
-    - Zrušení některých závislosti
+v1.0.39 (17.12.2019)
+- Oprava Bonusů
 
-    v1.0.26 (01.12.2019)
-    - Úpravy po změnách na webu novaplus.cz
+v1.0.38 (15.12.2019)
+- Drobné změny
 
-    v1.0.25 (26.11.2019)
-    - Úpravy po změnách na webu novaplus.cz
+v1.0.37 (15.12.2019)
+- Větší rozlišení náhledů
 
-    v1.0.24 (26.11.2019)
-    - Úpravy po změnách na webu novaplus.cz
+v1.0.36 (15.12.2019)
+- Opravy
 
-    v1.0.23 (24.11.2019)
-    - Úpravy po změnách na webu novaplus.cz
-    - Zobrazení pouze pořadů k přehrání
+v1.0.35 (15.12.2019)
+- Opravy
 
-    v1.0.22 (27.10.2019)
-    - Oprava poslední pořady
+v1.0.34 (14.12.2019)
+- Opravy kódování
 
-    v1.0.21 (19.10.2019)
-    - Oprava zdvojení položek v pořadech
+v1.0.33 (14.12.2019)
+- Opravy kódování
 
-    v1.0.20 (18.10.2019)
-    - Zobrazení pořadů v režimu seriál
-    - Abecední řazení pořadů
+v1.0.32 (14.12.2019)
+- Opravy kódování
 
-    v1.0.19 (01.10.2019)
-    - HTTPS
-    - Oprava kategorií
-    - Přechod na režim seznamu epizod
-    - Přidán čas videa do seznamu
-    - Přímé přehrávání videí
-    - Automatický výběr nejvyšší kvality videa
+v1.0.31 (14.12.2019)
+- Přidany jazykové řetězce
+- Drobné změny
+
+v1.0.30 (14.12.2019)
+- Drobné změny
+
+v1.0.29 (14.12.2019)
+- Drobné změny
+
+v1.0.28 (13.12.2019)
+- Změna min. závislosti Kodi 17+
+
+v1.0.27 (13.12.2019)
+- Úpravy po změnách na webu novaplus.cz
+- Pročištění kódu
+- Zrušení některých závislosti
+
+v1.0.26 (01.12.2019)
+- Úpravy po změnách na webu novaplus.cz
+
+v1.0.25 (26.11.2019)
+- Úpravy po změnách na webu novaplus.cz
+
+v1.0.24 (26.11.2019)
+- Úpravy po změnách na webu novaplus.cz
+
+v1.0.23 (24.11.2019)
+- Úpravy po změnách na webu novaplus.cz
+- Zobrazení pouze pořadů k přehrání
+
+v1.0.22 (27.10.2019)
+- Oprava poslední pořady
+
+v1.0.21 (19.10.2019)
+- Oprava zdvojení položek v pořadech
+
+v1.0.20 (18.10.2019)
+- Zobrazení pořadů v režimu seriál
+- Abecední řazení pořadů
+
+v1.0.19 (01.10.2019)
+- HTTPS
+- Oprava kategorií
+- Přechod na režim seznamu epizod
+- Přidán čas videa do seznamu
+- Přímé přehrávání videí
+- Automatický výběr nejvyšší kvality videa
     </news>
     <assets>
         <icon>resources/icon.png</icon>

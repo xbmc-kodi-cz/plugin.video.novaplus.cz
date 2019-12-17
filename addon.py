@@ -72,8 +72,11 @@ def ITEMS(title, dir=False):
     for section in sections:
         if section.find('h3').text == title.decode('utf-8'):
             for article in section.find_all('article'):
+                dur = article.find('span', {'class': 'e-duration'})
+                if dur != None:
+                    dur = _dur(dur.text)
                 if dir == False:
-                    addResolvedLink(article.a['title'], article.a['href'], _thumb(article.a.div.img['data-original']), _dur(article.find('span', {'class': 'e-duration'}).text))
+                    addResolvedLink(article.a['title'], article.a['href'], _thumb(article.a.div.img['data-original']), dur)
                 else:
                     xbmcplugin.setContent(addon_handle, 'tvshows')
                     addDir(article.a['title'], article.a['href'], 5, _thumb(article.a.div.img['data-original']))
