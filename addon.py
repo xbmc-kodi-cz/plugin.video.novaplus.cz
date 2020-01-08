@@ -89,11 +89,20 @@ def SHOWS(url):
         for link in article.find_all('a', href=re.compile(r'novaplus\.nova\.cz')):
             addDir(link['title'], link['href'], 5, link.div.img['data-original'])
 
-def EPISODES(url):
+def EPISODES(url, page):
     doc = _fetch(url)
+    next = doc.find('div', {'class': 'e-load-more'}).find('button')['data-href']
     for article in doc.find_all('article', 'b-article-news m-layout-playlist'):
         if article.find('span', {'class': 'e-label'})["class"][1] != 'voyo':
-            addResolvedLink(article.find('h3').text, article.a['href'], article.a.img['data-original'], _dur(article.find('span', {'class': 'e-duration'}).text))
+            title = article.find('h3').text
+            label = article.find('a', {'class': 'e-label bordered'})
+            if(label):
+                title=label.text+' | '+title
+            addResolvedLink(title, article.a['href'], article.a.img['data-original'], _dur(article.find('span', {'class': 'e-duration'}).text))
+    if(next):
+        u = sys.argv[0]+'?mode=9&url='+urllib.quote_plus(str(next.encode('utf-8')))+'&page=true'
+        liNext = xbmcgui.ListItem("Další")
+        xbmcplugin.addDirectoryItem(handle=addon_handle,url=u,listitem=liNext,isFolder=True)
 
 def VIDEOLINK(url):
     doc = _fetch(url)
@@ -173,12 +182,13 @@ elif mode==4:
     xbmcplugin.setContent(addon_handle, 'tvshows')
     SHOWS(url)
 elif mode==5:
-    EPISODES(url)
+    EPISODES(url, False)
 elif mode==6:
     VIDEOLINK(url)
 elif mode==7:
     ITEMS(title)
 elif mode==8:
     ITEMS(title, True)
-
+elif mode==9:
+    EPISODES(url, True)
 xbmcplugin.endOfDirectory(addon_handle)
