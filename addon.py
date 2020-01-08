@@ -97,11 +97,15 @@ def EPISODES(url):
 
 def VIDEOLINK(url):
     doc = _fetch(url)
-    bitrates = re.compile('src = {(.+?)\[(.+?)\]').findall(_fetch(doc.find('main').find('iframe')['src']).find_all('script')[-1].text.replace('\r','').replace('\n','').replace('\t',''));
-
-    if len(bitrates) > 0:
-        urls = re.compile('[\'\"](.+?)[\'\"]').findall(bitrates[0][1])
-        liz = xbmcgui.ListItem(path=urls[-1])
+    iframe =_fetch(doc.find('main').find('iframe')['src']).find_all('script')[-1].text.replace('\r','').replace('\n','').replace('\t','')
+    
+    try:
+        stream_url = re.compile('\"hls\": \"(.+?)\"').findall(iframe)[0]
+    except:
+        stream_url = re.compile('[\'\"](.+?)[\'\"]').findall(re.compile('src = {(.+?)\[(.+?)\]').findall(iframe)[0][1])[-1]
+        
+    if stream_url:
+        liz = xbmcgui.ListItem(path=stream_url)
         liz.setInfo( type='video', infoLabels={ 'title': doc.find('meta', property='og:title')[u'content'], 'plot': doc.find('meta', property='og:description')[u'content']})
         xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=liz)
 
