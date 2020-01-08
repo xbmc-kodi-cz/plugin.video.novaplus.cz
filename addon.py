@@ -92,17 +92,19 @@ def SHOWS(url):
 def EPISODES(url, page):
     doc = _fetch(url)
     next = doc.find('div', {'class': 'e-load-more'}).find('button')['data-href']
+    try: 
+        nav = doc.find('nav', {'class': 'navigation js-show-detail-nav'}).find_all('li')[2]
+        doc = _fetch(nav.find("a")["href"])
+    except:
+        nav=''
+        
+    next = doc.find('div', {'class': 'e-load-more'}).find('button')['data-href']
     for article in doc.find_all('article', 'b-article-news m-layout-playlist'):
         if article.find('span', {'class': 'e-label'})["class"][1] != 'voyo':
-            title = article.find('h3').text
-            label = article.find('a', {'class': 'e-label bordered'})
-            if(label):
-                title=label.text+' | '+title
-            addResolvedLink(title, article.a['href'], article.a.img['data-original'], _dur(article.find('span', {'class': 'e-duration'}).text))
-    if(next):
-        u = sys.argv[0]+'?mode=9&url='+urllib.quote_plus(str(next.encode('utf-8')))+'&page=true'
-        liNext = xbmcgui.ListItem("Další")
-        xbmcplugin.addDirectoryItem(handle=addon_handle,url=u,listitem=liNext,isFolder=True)
+            addResolvedLink(article.find('h3').text, article.a['href'], article.a.img['data-original'], _dur(article.find('span', {'class': 'e-duration'}).text))
+    u = sys.argv[0]+'?mode=9&url='+urllib.quote_plus(str(next.encode('utf-8')))+'&page=true'
+    liNext = xbmcgui.ListItem("Další")
+    xbmcplugin.addDirectoryItem(handle=addon_handle,url=u,listitem=liNext,isFolder=True)
 
 def VIDEOLINK(url):
     doc = _fetch(url)
