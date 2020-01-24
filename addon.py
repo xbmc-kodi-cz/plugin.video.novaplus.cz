@@ -91,13 +91,12 @@ def SHOWS(url):
 
 def EPISODES(url, page):
     doc = _fetch(url)
-    
-    try: 
-        nav = doc.find('nav', {'class': 'navigation js-show-detail-nav'}).find_all('li')[2]
-        doc = _fetch(nav.find("a")["href"])
+    try:
+        nav = doc.find('nav', {'class': 'navigation js-show-detail-nav'}).find_all('a', href=re.compile(".*cele-dily"))[0]
+        doc = _fetch(nav["href"])
     except:
-        nav=''  
-        
+        nav=''
+
     try:
         next = doc.find('div', {'class': 'e-load-more'}).find('button')['data-href']
     except:
@@ -109,7 +108,7 @@ def EPISODES(url, page):
             addResolvedLink(article.find('h3').text, article.a['href'], article.a.img['data-original'], _dur(article.find('span', {'class': 'e-duration'}).text))
             count = count + 1
     if(next and count == 5):
-        EPISODES(next.encode('utf-8'), True)
+        EPISODES(next, True)
 
 def VIDEOLINK(url):
     doc = _fetch(url)
@@ -117,13 +116,17 @@ def VIDEOLINK(url):
     
     try:
         stream_url = re.compile('\"hls\": \"(.+?)\"').findall(iframe)[0]
+        hls=True
     except:
         stream_url = re.compile('[\'\"](.+?)[\'\"]').findall(re.compile('src = {(.+?)\[(.+?)\]').findall(iframe)[0][1])[-1]
-        
+        hls=False
     if stream_url:
-        liz = xbmcgui.ListItem(path=stream_url)
-        liz.setInfo( type='video', infoLabels={ 'title': doc.find('meta', property='og:title')[u'content'], 'plot': doc.find('meta', property='og:description')[u'content']})
-        xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=liz)
+        play_item = xbmcgui.ListItem(path=stream_url)
+        if hls==True:
+            play_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+            play_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        play_item.setInfo( type='video', infoLabels={ 'title': doc.find('meta', property='og:title')[u'content'], 'plot': doc.find('meta', property='og:description')[u'content']})
+        xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=play_item)
 
 def addResolvedLink(title, url, iconimage, duration):
     xbmcplugin.setContent(addon_handle, 'episodes')
