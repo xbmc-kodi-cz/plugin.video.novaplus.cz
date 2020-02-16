@@ -10,7 +10,7 @@ import xbmcaddon
 import urlparse
 
 _baseurl_ = 'https://novaplus.nova.cz/'
-_useragent_ = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36'
+_useragent_ = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.106 Safari/537.36'
 _addon = xbmcaddon.Addon('plugin.video.novaplus.cz')
 _lang = _addon.getLocalizedString
 
@@ -40,7 +40,7 @@ def _thumb(url):
         th_size_h = 512
     else:
         th_size_w = 640
-        th_size_h = 362       
+        th_size_h = 360       
     return re.sub('r(.+?)x(.+?)n', 'r'+str(th_size_w)+'x'+str(th_size_h)+'n', url)
     
 def _dur(dur):
@@ -95,12 +95,12 @@ def EPISODES(url, page):
         nav = doc.find('nav', {'class': 'navigation js-show-detail-nav'}).find_all('a', href=re.compile(".*cele-dily"))[0]
         doc = _fetch(nav["href"])
     except:
-        nav=''
+        nav=None
 
     try:
         next = doc.find('div', {'class': 'e-load-more'}).find('button')['data-href']
     except:
-        next=''
+        next=None
         
     count = 0  
     for article in doc.find_all('article', 'b-article-news m-layout-playlist'):
