@@ -40,7 +40,7 @@ def _thumb(url):
         th_size_h = 512
     else:
         th_size_w = 640
-        th_size_h = 360       
+        th_size_h = 360
     return re.sub('r(.+?)x(.+?)n', 'r'+str(th_size_w)+'x'+str(th_size_h)+'n', url)
     
 def _dur(dur):
@@ -87,7 +87,7 @@ def SHOWS(url):
     shows = doc.find_all('div', {'class': 'b-tiles-wrapper'})
     for article in shows[1].find_all('article'):
         for link in article.find_all('a', href=re.compile(r'novaplus\.nova\.cz')):
-            addDir(link['title'], link['href'], 5, link.div.img['data-original'])
+            addDir(link['title'], link['href'], 5, _thumb(link.div.img['data-original']))
 
 def EPISODES(url, page):
     doc = _fetch(url)
@@ -116,15 +116,11 @@ def VIDEOLINK(url):
     
     try:
         stream_url = re.compile('\"hls\": \"(.+?)\"').findall(iframe)[0]
-        hls=True
     except:
         stream_url = re.compile('[\'\"](.+?)[\'\"]').findall(re.compile('src = {(.+?)\[(.+?)\]').findall(iframe)[0][1])[-1]
-        hls=False
+        
     if stream_url:
         play_item = xbmcgui.ListItem(path=stream_url)
-        if hls==True:
-            play_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
-            play_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
         play_item.setInfo( type='video', infoLabels={ 'title': doc.find('meta', property='og:title')[u'content'], 'plot': doc.find('meta', property='og:description')[u'content']})
         xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=play_item)
 
