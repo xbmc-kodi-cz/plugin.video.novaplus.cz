@@ -112,18 +112,16 @@ def EPISODES(url, page):
 
 def VIDEOLINK(url):
     doc = _fetch(url)
-    iframe =_fetch(doc.find('main').find('iframe')['src']).find_all('script')[-1].text.replace('\r','').replace('\n','').replace('\t','')
-    
-    try:
-        stream_url = re.compile('\"hls\": \"(.+?)\"').findall(iframe)[0]
-    except:
-        stream_url = re.compile('[\'\"](.+?)[\'\"]').findall(re.compile('src = {(.+?)\[(.+?)\]').findall(iframe)[0][1])[-1]
+
+    iframe =_fetch(doc.find('main').find('iframe')['src']).find_all('script')[-1].text.replace('\r','').replace('\n','').replace('\t','').replace('\\','')
+ 
+    stream_url = re.compile('\"HLS\":\[{\"src\":\"(.+?)\",').findall(iframe)[0]
         
     if stream_url:
         play_item = xbmcgui.ListItem(path=stream_url)
         play_item.setInfo( type='video', infoLabels={ 'title': doc.find('meta', property='og:title')[u'content'], 'plot': doc.find('meta', property='og:description')[u'content']})
         xbmcplugin.setResolvedUrl(handle=addon_handle, succeeded=True, listitem=play_item)
-
+        
 def addResolvedLink(title, url, iconimage, duration):
     xbmcplugin.setContent(addon_handle, 'episodes')
     return addItem(title, url, 6, iconimage, duration, False)
