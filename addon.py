@@ -129,7 +129,7 @@ def addResolvedLink(title, url, iconimage, duration):
 def addItem(title, url, mode, iconimage, duration, isfolder):  
     u=sys.argv[0]+'?url='+urllib.quote_plus(url.encode('utf-8'))+'&mode='+str(mode)+'&title='+urllib.quote_plus(title.encode('utf-8'))
     ok=True
-    liz=xbmcgui.ListItem(title, thumbnailImage=iconimage)
+    liz=xbmcgui.ListItem(title.strip(), thumbnailImage=iconimage)
     liz.setInfo('video', infoLabels={'mediatype': 'episode', 'title': title, 'duration': duration})
     liz.setProperty('fanart_image', iconimage)
     if not isfolder:
