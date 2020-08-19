@@ -1,22 +1,37 @@
 # Kodi Media Center language file
 # Addon Name: Nova Plus
 # Addon id: plugin.video.novaplus.cz
-# Addon Provider: Jiri Vyhnalek, wombat
+# Addon Provider: wombat
 msgid ""
 msgstr ""
-"Project-Id-Version: Kodi Addons\n"
-"Report-Msgid-Bugs-To: https://forum.kodi.tv/\n"
-"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Kodi Translation Team\n"
-"Language-Team: Team-Kodi\n"
-"MIME-Version: 1.0\n"
+
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Language: cs_CZ\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Language: cs\n"
 
 msgctxt "#30001"
-msgid "All shows"
-msgstr "Všechny pořady"
+msgid "Recent Episodes"
+msgstr "Poslední díly"
 
+msgctxt "#30002"
+msgid "TOP Shows"
+msgstr "TOP pořady"
+
+msgctxt "#30003"
+msgid "Shows"
+msgstr "Pořady"
+
+msgctxt "#30004"
+msgid "Next videos"
+msgstr "Další videa"
+
+msgctxt "#30005"
+msgid "Go to show"
+msgstr "Přejít na pořad"
+
+msgctxt "#30006"
+msgid "No stream found"
+msgstr "Žádný stream nenalezen"
+
+msgctxt "#30007"
+msgid "Categories"
+msgstr "Kategorie"
