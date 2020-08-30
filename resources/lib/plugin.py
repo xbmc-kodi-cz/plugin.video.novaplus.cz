@@ -8,6 +8,7 @@ import re
 from bs4 import BeautifulSoup
 import requests
 import inputstreamhelper
+import json
 
 _addon = xbmcaddon.Addon()
 
@@ -24,7 +25,7 @@ def list_shows(type):
     for article in articles:
         title = article['title']
         list_item = xbmcgui.ListItem(label=title)
-        list_item.setInfo('video', {'mediatype': 'tvshow', 'tvshowtitle': title})
+        list_item.setInfo('video', {'mediatype': 'tvshow', 'title': title})
         list_item.setArt({'poster': article.div.img['data-original']})
         listing.append((plugin.url_for(get_list, category = False, show_url = article['href']), list_item, True))
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
@@ -104,21 +105,27 @@ def get_category():
 def get_video(url):
     PROTOCOL = 'mpd'
     DRM = 'com.widevine.alpha'
+    source_type = _addon.getSetting('source_type')
     embeded = get_page(get_page(url).find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1].get_text()
-    stream_url = re.compile('\"DASH\":\[{\"src\":\"(.+?)\",').findall(embeded)
-    if stream_url:
-        drm = re.compile('\"X-AxDRM-Message\":\"(.+?)\"}}}\]').findall(embeded)
-        is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
-        if is_helper.check_inputstream():
-            list_item = xbmcgui.ListItem(path=stream_url[0].replace('\\',''))
-            list_item.setContentLookup(False)
-            list_item.setMimeType('application/dash+xml')
-            list_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
-            list_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
-            if drm:
-                list_item.setProperty('inputstream.adaptive.license_type', DRM)
-                list_item.setProperty('inputstream.adaptive.license_key', 'https://drm-widevine-licensing.axprod.net/AcquireLicense' + '|' + 'X-AxDRM-Message=' + drm[0] + '|R{SSM}|')
-            xbmcplugin.setResolvedUrl(plugin.handle, True, list_item)
+    json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(embeded)[0])
+    if json_data:
+        stream_data = json_data[source_type][0]
+        if not 'drm' in stream_data and source_type == 'HLS':
+            list_item = xbmcgui.ListItem(path=stream_data['src'])
+        else:
+            is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
+            if is_helper.check_inputstream():
+                stream_data = json_data['DASH'][0]
+                list_item = xbmcgui.ListItem(path=stream_data['src'])
+                list_item.setContentLookup(False)
+                list_item.setMimeType(stream_data['type'])
+                list_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+                list_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
+                if 'drm' in stream_data:
+                    drm = stream_data['drm'][1]
+                    list_item.setProperty('inputstream.adaptive.license_type', DRM)
+                    list_item.setProperty('inputstream.adaptive.license_key', drm['serverURL'] + '|' + 'X-AxDRM-Message=' + drm['headers'][0]['value'] + '|R{SSM}|')
+        xbmcplugin.setResolvedUrl(plugin.handle, True, list_item)
     else:
         xbmcgui.Dialog().notification(_addon.getAddonInfo('name'),_addon.getLocalizedString(30006), xbmcgui.NOTIFICATION_ERROR, 5000)
 
@@ -141,11 +148,11 @@ def root():
     listing.append((plugin.url_for(list_recent), list_item, True))
 
     list_item = xbmcgui.ListItem(_addon.getLocalizedString(30002))
-    list_item.setArt({'icon': 'DefaultMovies.png'})
+    list_item.setArt({'icon': 'DefaultTVShows.png'})
     listing.append((plugin.url_for(list_shows, 0), list_item, True))
 
     list_item = xbmcgui.ListItem(_addon.getLocalizedString(30003))
-    list_item.setArt({'icon': 'DefaultMovies.png'})
+    list_item.setArt({'icon': 'DefaultTVShows.png'})
     listing.append((plugin.url_for(list_shows, 1), list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
