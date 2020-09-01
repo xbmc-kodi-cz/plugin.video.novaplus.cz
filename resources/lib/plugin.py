@@ -65,8 +65,7 @@ def get_list():
         listing.append((plugin.url_for(get_category, show_url = url), list_item, True))
         url = plugin.args['show_url'][0]+'/cele-dily'
     soup = get_page(url)
-    showtitle = soup.find('h1', 'title')
-    # <h1 class="title"><a href="https://novaplus.nova.cz/porad/masterchef-cesko">MasterChef Česko</a></h1
+    showtitle = soup.find('h1', 'title').get_text()
     articles = soup.find_all('article', 'b-article-news m-layout-playlist')
     count = 0
     for article in articles:
@@ -76,7 +75,7 @@ def get_list():
             if dur:
                 dur = get_duration(dur.get_text())
             list_item = xbmcgui.ListItem(title)
-            list_item.setInfo('video', {'mediatype': 'episode', 'tvshowtitle': showtitle.get_text(), 'title': title, 'duration': dur})
+            list_item.setInfo('video', {'mediatype': 'episode', 'tvshowtitle': showtitle, 'title': title, 'duration': dur})
             list_item.setArt({'thumb': article.a.img['data-original']})
             list_item.setProperty('IsPlayable', 'true')
             listing.append((plugin.url_for(get_video, article.a['href']), list_item, False))
