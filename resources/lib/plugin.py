@@ -108,7 +108,7 @@ def get_video(url):
     DRM = 'com.widevine.alpha'
     source_type = _addon.getSetting('source_type')
     soup = get_page(url)
-    desc = soup.find('meta', {'name':'description'})['content'].encode('utf-8')
+    desc = soup.find('meta', {'name':'description'})['content'].encode('utf-8').replace('&nbsp;',' ')
     showtitle = soup.find('h1', {'class':'title'}).find('a').get_text().encode('utf-8')
     title = soup.find('h2', {'class':'subtitle'}).get_text().encode('utf-8')
     embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1].get_text()
