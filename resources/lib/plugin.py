@@ -65,6 +65,8 @@ def get_list():
         listing.append((plugin.url_for(get_category, show_url = url), list_item, True))
         url = plugin.args['show_url'][0]+'/cele-dily'
     soup = get_page(url)
+    showtitle = soup.find('h1', 'title')
+    # <h1 class="title"><a href="https://novaplus.nova.cz/porad/masterchef-cesko">MasterChef Česko</a></h1
     articles = soup.find_all('article', 'b-article-news m-layout-playlist')
     count = 0
     for article in articles:
@@ -74,7 +76,7 @@ def get_list():
             if dur:
                 dur = get_duration(dur.get_text())
             list_item = xbmcgui.ListItem(title)
-            list_item.setInfo('video', {'mediatype': 'episode', 'title': title, 'duration': dur})
+            list_item.setInfo('video', {'mediatype': 'episode', 'tvshowtitle': showtitle.get_text(), 'title': title, 'duration': dur})
             list_item.setArt({'thumb': article.a.img['data-original']})
             list_item.setProperty('IsPlayable', 'true')
             listing.append((plugin.url_for(get_video, article.a['href']), list_item, False))
@@ -106,17 +108,23 @@ def get_video(url):
     PROTOCOL = 'mpd'
     DRM = 'com.widevine.alpha'
     source_type = _addon.getSetting('source_type')
-    embeded = get_page(get_page(url).find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1].get_text()
+    soup = get_page(url)
+    desc = soup.find('div', {'class':'complete'}).get_text().encode('utf-8')
+    showtitle = soup.find('h1', {'class':'title'}).find('a').get_text().encode('utf-8')
+    title = soup.find('h2', {'class':'subtitle'}).get_text().encode('utf-8')
+    embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1].get_text()
     json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(embeded)[0])
     if json_data:
         stream_data = json_data[source_type][0]
-        if not 'drm' in stream_data and source_type == 'HLS':
-            list_item = xbmcgui.ListItem(path=stream_data['src'])
+        list_item = xbmcgui.ListItem()
+        list_item.setInfo('video', {'mediatype': 'episode', 'tvshowtitle': showtitle, 'title': title, 'plot' : desc})
+        if not 'drm' in stream_data and source_type == 'HLS':   
+            list_item.setPath(stream_data['src'])
         else:
             is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
             if is_helper.check_inputstream():
                 stream_data = json_data['DASH'][0]
-                list_item = xbmcgui.ListItem(path=stream_data['src'])
+                list_item.setPath(stream_data['src'])
                 list_item.setContentLookup(False)
                 list_item.setMimeType(stream_data['type'])
                 list_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
