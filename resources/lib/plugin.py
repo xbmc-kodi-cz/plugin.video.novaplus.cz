@@ -23,11 +23,11 @@ def list_shows(type):
     listing = []
     articles = soup.find_all('div', {'class': 'b-show-listing'})[int(type)].find('div', {'class': 'b-tiles-wrapper'}).find_all('a')
     for article in articles:
-        title = article['title']
+        title = article['title'].encode('utf-8')
         list_item = xbmcgui.ListItem(label=title)
         list_item.setInfo('video', {'mediatype': 'tvshow', 'title': title})
         list_item.setArt({'poster': article.div.img['data-original']})
-        listing.append((plugin.url_for(get_list, category = False, show_url = article['href']), list_item, True))
+        listing.append((plugin.url_for(get_list, category = False, show_url = article['href'], showtitle = title), list_item, True))
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
 
@@ -57,15 +57,20 @@ def list_recent():
 
 @plugin.route('/get_list/')
 def get_list():
+    print plugin.args
     xbmcplugin.setContent(plugin.handle, 'episodes')
     listing = []  
     url = plugin.args['show_url'][0]
-    if plugin.args['category'][0] == 'False':
+    category = plugin.args['category'][0]
+    if category == 'False':
         list_item = xbmcgui.ListItem(label=_addon.getLocalizedString(30007))
         listing.append((plugin.url_for(get_category, show_url = url), list_item, True))
         url = plugin.args['show_url'][0]+'/cele-dily'
     soup = get_page(url)
-    showtitle = soup.find('h1', 'title').get_text()
+    if 'showtitle' in plugin.args:
+        showtitle = plugin.args['showtitle'][0].encode('utf-8')
+    else:
+        showtitle = soup.find('h1', 'title').get_text().encode('utf-8')
     articles = soup.find_all('article', 'b-article-news m-layout-playlist')
     count = 0
     for article in articles:
@@ -83,7 +88,7 @@ def get_list():
     next = soup.find('div', {'class': 'e-load-more'})
     if next and count == 5:
         list_item = xbmcgui.ListItem(label=_addon.getLocalizedString(30004))
-        listing.append((plugin.url_for(get_list, category = None, show_url = next.find('button')['data-href']), list_item, True))
+        listing.append((plugin.url_for(get_list, category = category, show_url = next.find('button')['data-href'], showtitle = showtitle), list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
