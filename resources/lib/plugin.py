@@ -57,7 +57,6 @@ def list_recent():
 
 @plugin.route('/get_list/')
 def get_list():
-    print plugin.args
     xbmcplugin.setContent(plugin.handle, 'episodes')
     listing = []  
     url = plugin.args['show_url'][0]
