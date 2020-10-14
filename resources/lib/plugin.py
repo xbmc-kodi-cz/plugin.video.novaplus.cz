@@ -74,6 +74,7 @@ def get_list():
     count = 0
     for article in articles:
         if article.find('span', {'class': 'e-label'})["class"][1] != 'voyo':
+            get_page(url)
             title = article.a['title']
             dur = article.find('span', {'class':'e-duration'})
             if dur:
