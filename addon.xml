@@ -1,4 +1,4 @@
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.2.4">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.2.5">
     <requires>
         <import addon="xbmc.python" version="2.26.0" />
         <import addon="script.module.requests" version="2.22.0" />
