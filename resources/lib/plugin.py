@@ -23,7 +23,7 @@ def list_shows(type):
     listing = []
     articles = soup.find_all('div', {'class': 'b-show-listing'})[int(type)].find('div', {'class': 'b-tiles-wrapper'}).find_all('a')
     for article in articles:
-        title = article['title'].encode('utf-8')
+        title = article['title']
         list_item = xbmcgui.ListItem(label=title)
         list_item.setInfo('video', {'mediatype': 'tvshow', 'title': title})
         list_item.setArt({'poster': article.div.img['data-original']})
@@ -42,7 +42,7 @@ def list_recent():
         title = article.find('span', {'class':'e-text'}).get_text()
         dur = article.find('span', {'class':'e-duration'})
         show_url = re.compile('(.+)\/.+\/').findall(article.find('a')['href'])[0]
-        menuitems.append(( _addon.getLocalizedString(30005), 'XBMC.Container.Update('+plugin.url_for(get_list, category = False, show_url = show_url)+')' ))
+        menuitems.append(( _addon.getLocalizedString(30005), 'Container.Update('+plugin.url_for(get_list, category = 'True', show_url = show_url)+')'))
         if dur:
             dur = get_duration(article.find('span', {'class':'e-duration'}).get_text())
         list_item = xbmcgui.ListItem(label = title)
@@ -58,18 +58,18 @@ def list_recent():
 @plugin.route('/get_list/')
 def get_list():
     xbmcplugin.setContent(plugin.handle, 'episodes')
-    listing = []  
+    listing = []
     url = plugin.args['show_url'][0]
     category = plugin.args['category'][0]
-    if category == 'False':
+    if category == 'True':
         list_item = xbmcgui.ListItem(label=_addon.getLocalizedString(30007))
         listing.append((plugin.url_for(get_category, show_url = url), list_item, True))
         url = plugin.args['show_url'][0]+'/cele-dily'
     soup = get_page(url)
     if 'showtitle' in plugin.args:
-        showtitle = plugin.args['showtitle'][0].encode('utf-8')
+        showtitle = plugin.args['showtitle'][0]
     else:
-        showtitle = soup.find('h1', 'title').get_text().encode('utf-8')
+        showtitle = soup.find('h1', 'title').get_text()
     articles = soup.find_all('article', 'b-article-news m-layout-playlist')
     count = 0
     for article in articles:
@@ -87,7 +87,7 @@ def get_list():
     next = soup.find('div', {'class': 'e-load-more'})
     if next and count == 5:
         list_item = xbmcgui.ListItem(label=_addon.getLocalizedString(30004))
-        listing.append((plugin.url_for(get_list, category = category, show_url = next.find('button')['data-href'], showtitle = showtitle), list_item, True))
+        listing.append((plugin.url_for(get_list, category = False, show_url = next.find('button')['data-href'], showtitle = showtitle), list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
@@ -101,7 +101,7 @@ def get_category():
         for nav in navs.find_all('a'):
             list_item = xbmcgui.ListItem(nav['title'])
             list_item.setInfo('video', {'mediatype': 'episode'})
-            listing.append((plugin.url_for(get_list, category = True, show_url = nav['href']), list_item, True))
+            listing.append((plugin.url_for(get_list, category = 'False', show_url = nav['href']), list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
@@ -112,26 +112,27 @@ def get_video(url):
     DRM = 'com.widevine.alpha'
     source_type = _addon.getSetting('source_type')
     soup = get_page(url)
-    desc = soup.find('meta', {'name':'description'})['content'].encode('utf-8').replace('&nbsp;',' ')
-    showtitle = soup.find('h1', {'class':'title'}).find('a').get_text().encode('utf-8')
-    title = soup.find('h2', {'class':'subtitle'}).get_text().encode('utf-8')
+    desc = soup.find('meta', {'name':'description'})['content'].replace('&nbsp;',' ')
+    showtitle = soup.find('h1', {'class':'title'}).find('a').get_text()
+    title = soup.find('h2', {'class':'subtitle'}).get_text()
     embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1].get_text()
     json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(embeded)[0])
     if json_data:
         stream_data = json_data[source_type][0]
         list_item = xbmcgui.ListItem()
         list_item.setInfo('video', {'mediatype': 'episode', 'tvshowtitle': showtitle, 'title': title, 'plot' : desc})
-        if not 'drm' in stream_data and source_type == 'HLS':   
+        if not 'drm' in stream_data and source_type == 'HLS':
             list_item.setPath(stream_data['src'])
         else:
             is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
             if is_helper.check_inputstream():
                 stream_data = json_data['DASH'][0]
+                print(stream_data['type'])
                 list_item.setPath(stream_data['src'])
                 list_item.setContentLookup(False)
-                list_item.setMimeType(stream_data['type'])
+                list_item.setMimeType('application/xml+dash')
+                list_item.setProperty('inputstream', 'inputstream.adaptive')
                 list_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
-                list_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
                 if 'drm' in stream_data:
                     drm = stream_data['drm'][1]
                     list_item.setProperty('inputstream.adaptive.license_type', DRM)
