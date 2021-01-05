@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-<setting label="30008" type="labelenum" id="source_type" values="DASH|HLS" default="HLS" />
+    <category label="31001">
+        <setting label="31002" type="labelenum" id="source_type" values="DASH|HLS" default="HLS" />
+    </category>
 </settings>

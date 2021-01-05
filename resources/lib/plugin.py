@@ -115,8 +115,9 @@ def get_video(url):
     desc = soup.find('meta', {'name':'description'})['content'].replace('&nbsp;',' ')
     showtitle = soup.find('h1', {'class':'title'}).find('a').get_text()
     title = soup.find('h2', {'class':'subtitle'}).get_text()
-    embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1].get_text()
-    json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(embeded)[0])
+    embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1]
+    json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(str(embeded))[0])
+
     if json_data:
         stream_data = json_data[source_type][0]
         list_item = xbmcgui.ListItem()
