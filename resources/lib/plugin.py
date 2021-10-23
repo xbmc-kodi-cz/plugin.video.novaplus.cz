@@ -115,8 +115,8 @@ def get_video(url):
     desc = soup.find('meta', {'name':'description'})['content'].encode('utf-8').replace('&nbsp;',' ')
     showtitle = soup.find('h1', {'class':'title'}).find('a').get_text().encode('utf-8')
     title = soup.find('h2', {'class':'subtitle'}).get_text().encode('utf-8')
-    embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1].get_text()
-    json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(embeded)[0])
+    embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1]
+    json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(str(embeded))[0])
     if json_data:
         stream_data = json_data[source_type][0]
         list_item = xbmcgui.ListItem()
@@ -127,11 +127,12 @@ def get_video(url):
             is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
             if is_helper.check_inputstream():
                 stream_data = json_data['DASH'][0]
+                print(stream_data['type'])
                 list_item.setPath(stream_data['src'])
                 list_item.setContentLookup(False)
-                list_item.setMimeType(stream_data['type'])
+                list_item.setMimeType('application/xml+dash')
+                list_item.setProperty('inputstream', 'inputstream.adaptive')
                 list_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
-                list_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
                 if 'drm' in stream_data:
                     drm = stream_data['drm'][1]
                     list_item.setProperty('inputstream.adaptive.license_type', DRM)
