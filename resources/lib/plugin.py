@@ -16,44 +16,56 @@ plugin = routing.Plugin()
 
 _baseurl = 'https://novaplus.nova.cz/'
 
+
 @plugin.route('/list_shows/<type>')
 def list_shows(type):
     xbmcplugin.setContent(plugin.handle, 'tvshows')
     soup = get_page(_baseurl+'porady')
     listing = []
-    articles = soup.find_all('div', {'class': 'b-show-listing'})[int(type)].find('div', {'class': 'b-tiles-wrapper'}).find_all('a')
+    articles = soup.find_all('div', {'class': 'b-show-listing'})[int(
+        type)].find('div', {'class': 'b-tiles-wrapper'}).find_all('a')
     for article in articles:
         title = article['title']
         list_item = xbmcgui.ListItem(label=title)
         list_item.setInfo('video', {'mediatype': 'tvshow', 'title': title})
         list_item.setArt({'poster': article.div.img['data-original']})
-        listing.append((plugin.url_for(get_list, category = False, show_url = article['href'], showtitle = title), list_item, True))
+        listing.append((plugin.url_for(get_list, category=True,
+                       show_url=article['href'], showtitle=title), list_item, True))
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
+
 
 @plugin.route('/list_recent/')
 def list_recent():
     xbmcplugin.setContent(plugin.handle, 'episodes')
     soup = get_page(_baseurl)
     listing = []
-    articles = soup.find('section', {'class':'b-main-section b-section-articles my-5'}).find_all('article', {'class':'b-article b-article-no-labels'})
+    articles = soup.find('section', {'class': 'b-main-section b-section-articles my-5'}
+                         ).find_all('article', {'class': 'b-article b-article-no-labels'})
     for article in articles:
         menuitems = []
-        title = article.find('span', {'class':'e-text'}).get_text()
-        dur = article.find('span', {'class':'e-duration'})
-        show_url = re.compile('(.+)\/.+\/').findall(article.find('a')['href'])[0]
-        menuitems.append(( _addon.getLocalizedString(30005), 'Container.Update('+plugin.url_for(get_list, category = 'True', show_url = show_url)+')'))
+        title = article.find('span', {'class': 'e-text'}).get_text()
+        dur = article.find('span', {'class': 'e-duration'})
+        show_url = re.compile(
+            '(.+)\/.+\/').findall(article.find('a')['href'])[0]
+        menuitems.append((_addon.getLocalizedString(30005), 'Container.Update(' +
+                         plugin.url_for(get_list, category='True', show_url=show_url)+')'))
         if dur:
-            dur = get_duration(article.find('span', {'class':'e-duration'}).get_text())
-        list_item = xbmcgui.ListItem(label = title)
-        list_item.setInfo('video', {'mediatype': 'episode', 'title': title, 'duration': dur})
-        list_item.setArt({'icon': article.find('img', {'class':'e-image'})['data-original']})
+            dur = get_duration(article.find(
+                'span', {'class': 'e-duration'}).get_text())
+        list_item = xbmcgui.ListItem(label=title)
+        list_item.setInfo(
+            'video', {'mediatype': 'episode', 'title': title, 'duration': dur})
+        list_item.setArt({'icon': article.find(
+            'img', {'class': 'e-image'})['data-original']})
         list_item.setProperty('IsPlayable', 'true')
         list_item.addContextMenuItems(menuitems)
-        listing.append((plugin.url_for(get_video, article.find('a')['href']), list_item, False))
+        listing.append(
+            (plugin.url_for(get_video, article.find('a')['href']), list_item, False))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
+
 
 @plugin.route('/get_list/')
 def get_list():
@@ -63,7 +75,8 @@ def get_list():
     category = plugin.args['category'][0]
     if category == 'True':
         list_item = xbmcgui.ListItem(label=_addon.getLocalizedString(30007))
-        listing.append((plugin.url_for(get_category, show_url = url), list_item, True))
+        listing.append(
+            (plugin.url_for(get_category, show_url=url), list_item, True))
         url = plugin.args['show_url'][0]+'/cele-dily'
     soup = get_page(url)
     if 'showtitle' in plugin.args:
@@ -75,24 +88,28 @@ def get_list():
     for article in articles:
         if article.find('span', {'class': 'e-label'})["class"][1] != 'voyo':
             title = article.a['title']
-            dur = article.find('span', {'class':'e-duration'})
+            dur = article.find('span', {'class': 'e-duration'})
             if dur:
                 dur = get_duration(dur.get_text())
             list_item = xbmcgui.ListItem(title)
-            list_item.setInfo('video', {'mediatype': 'episode', 'tvshowtitle': showtitle, 'title': title, 'duration': dur})
+            list_item.setInfo('video', {
+                              'mediatype': 'episode', 'tvshowtitle': showtitle, 'title': title, 'duration': dur})
             list_item.setArt({'thumb': article.a.img['data-original']})
             list_item.setProperty('IsPlayable', 'true')
-            listing.append((plugin.url_for(get_video, article.a['href']), list_item, False))
-            count +=1
+            listing.append(
+                (plugin.url_for(get_video, article.a['href']), list_item, False))
+            count += 1
     next = soup.find('div', {'class': 'e-load-more'})
     if next and count == 5:
         list_item = xbmcgui.ListItem(label=_addon.getLocalizedString(30004))
-        listing.append((plugin.url_for(get_list, category = False, show_url = next.find('button')['data-href'], showtitle = showtitle), list_item, True))
+        listing.append((plugin.url_for(get_list, category=False, show_url=next.find(
+            'button')['data-href'], showtitle=showtitle), list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
 
-@plugin.route('/get_catogory/')
+
+@plugin.route('/get_category/')
 def get_category():
     listing = []
     soup = get_page(plugin.args['show_url'][0])
@@ -101,10 +118,12 @@ def get_category():
         for nav in navs.find_all('a'):
             list_item = xbmcgui.ListItem(nav['title'])
             list_item.setInfo('video', {'mediatype': 'episode'})
-            listing.append((plugin.url_for(get_list, category = 'False', show_url = nav['href']), list_item, True))
+            listing.append((plugin.url_for(
+                get_list, category='False', show_url=nav['href']), list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
+
 
 @plugin.route('/get_video/<path:url>')
 def get_video(url):
@@ -112,16 +131,20 @@ def get_video(url):
     DRM = 'com.widevine.alpha'
     source_type = _addon.getSetting('source_type')
     soup = get_page(url)
-    desc = soup.find('meta', {'name':'description'})['content'].replace('&nbsp;',' ')
-    showtitle = soup.find('h1', {'class':'title'}).find('a').get_text()
-    title = soup.find('h2', {'class':'subtitle'}).get_text()
-    embeded = get_page(soup.find('div', {'class':'b-image video'}).find('iframe')['src']).find_all('script')[-1]
-    json_data = json.loads(re.compile('{\"tracks\":(.+?),\"duration\"').findall(str(embeded))[0])
+    desc = soup.find('meta', {'name': 'description'})[
+        'content'].replace('&nbsp;', ' ')
+    showtitle = soup.find('h1', {'class': 'title'}).find('a').get_text()
+    title = soup.find('h2', {'class': 'subtitle'}).get_text()
+    embeded = get_page(soup.find(
+        'div', {'class': 'b-image video'}).find('iframe')['src']).find_all('script')[-1]
+    json_data = json.loads(re.compile(
+        '{\"tracks\":(.+?),\"duration\"').findall(str(embeded))[0])
 
     if json_data:
         stream_data = json_data[source_type][0]
         list_item = xbmcgui.ListItem()
-        list_item.setInfo('video', {'mediatype': 'episode', 'tvshowtitle': showtitle, 'title': title, 'plot' : desc})
+        list_item.setInfo('video', {
+                          'mediatype': 'episode', 'tvshowtitle': showtitle, 'title': title, 'plot': desc})
         if not 'drm' in stream_data and source_type == 'HLS':
             list_item.setPath(stream_data['src'])
         else:
@@ -133,14 +156,19 @@ def get_video(url):
                 list_item.setContentLookup(False)
                 list_item.setMimeType('application/xml+dash')
                 list_item.setProperty('inputstream', 'inputstream.adaptive')
-                list_item.setProperty('inputstream.adaptive.manifest_type', PROTOCOL)
+                list_item.setProperty(
+                    'inputstream.adaptive.manifest_type', PROTOCOL)
                 if 'drm' in stream_data:
                     drm = stream_data['drm'][1]
-                    list_item.setProperty('inputstream.adaptive.license_type', DRM)
-                    list_item.setProperty('inputstream.adaptive.license_key', drm['serverURL'] + '|' + 'X-AxDRM-Message=' + drm['headers'][0]['value'] + '|R{SSM}|')
+                    list_item.setProperty(
+                        'inputstream.adaptive.license_type', DRM)
+                    list_item.setProperty('inputstream.adaptive.license_key',
+                                          drm['serverURL'] + '|' + 'X-AxDRM-Message=' + drm['headers'][0]['value'] + '|R{SSM}|')
         xbmcplugin.setResolvedUrl(plugin.handle, True, list_item)
     else:
-        xbmcgui.Dialog().notification(_addon.getAddonInfo('name'),_addon.getLocalizedString(30006), xbmcgui.NOTIFICATION_ERROR, 5000)
+        xbmcgui.Dialog().notification(_addon.getAddonInfo('name'),
+                                      _addon.getLocalizedString(30006), xbmcgui.NOTIFICATION_ERROR, 5000)
+
 
 def get_duration(dur):
     duration = 0
@@ -149,9 +177,12 @@ def get_duration(dur):
         duration += int(value) * 60 ** pos
     return duration
 
+
 def get_page(url):
-    r = requests.get(url, headers={'User-Agent': 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'})
+    r = requests.get(url, headers={
+                     'User-Agent': 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0'})
     return BeautifulSoup(r.content, 'html.parser')
+
 
 @plugin.route('/')
 def root():
@@ -170,6 +201,7 @@ def root():
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
+
 
 def run():
     plugin.run()
