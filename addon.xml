@@ -1,4 +1,4 @@
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.3.2">
+<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.3.3">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
         <import addon="script.module.requests" version="2.22.0" />
@@ -16,7 +16,7 @@
         <description lang="cs_CZ">Vaše oblíbené seriály, pořady a živé vysílání TV Nova na online televizi Nova Plus, které si pustíte, kdy chcete vy.</description>
         <platform>all</platform>
         <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
-        <news>Oprava zobrazení celých dílů
+        <news>Sledování živě
         </news>
         <assets>
             <icon>resources/icon.png</icon>
