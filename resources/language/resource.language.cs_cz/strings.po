@@ -36,6 +36,10 @@ msgctxt "#30007"
 msgid "Categories"
 msgstr "Kategorie"
 
+msgctxt "#30008"
+msgid "Live"
+msgstr "Živě"
+
 msgctxt "#31001"
 msgid "General"
 msgstr "Obecné"

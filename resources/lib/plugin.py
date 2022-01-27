@@ -94,7 +94,7 @@ def list_live():
     xbmcplugin.endOfDirectory(plugin.handle)
 
 
-@ plugin.route('/get_list/')
+@plugin.route('/get_list/')
 def get_list():
     xbmcplugin.setContent(plugin.handle, 'episodes')
     listing = []
@@ -136,7 +136,7 @@ def get_list():
     xbmcplugin.endOfDirectory(plugin.handle)
 
 
-@ plugin.route('/get_category/')
+@plugin.route('/get_category/')
 def get_category():
     listing = []
     soup = get_page(plugin.args['show_url'][0])
@@ -152,7 +152,7 @@ def get_category():
     xbmcplugin.endOfDirectory(plugin.handle)
 
 
-@ plugin.route('/get_video/<path:url>')
+@plugin.route('/get_video/<path:url>')
 def get_video(url):
     PROTOCOL = 'mpd'
     DRM = 'com.widevine.alpha'
@@ -196,7 +196,7 @@ def get_video(url):
                                       _addon.getLocalizedString(30006), xbmcgui.NOTIFICATION_ERROR, 5000)
 
 
-@ plugin.route('/get_live/<path:url>')
+@plugin.route('/get_live/<path:url>')
 def get_live(url):
     soup = get_page(url)
     embeded = get_page(soup.find(
@@ -229,11 +229,11 @@ def get_page(url):
     return BeautifulSoup(r.content, 'html.parser')
 
 
-@ plugin.route('/')
+@plugin.route('/')
 def root():
     listing = []
 
-    list_item = xbmcgui.ListItem("Živě")
+    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30008))
     list_item.setArt({'icon': 'DefaultAddonPVRClient.png'})
     listing.append((plugin.url_for(list_live), list_item, True))
 

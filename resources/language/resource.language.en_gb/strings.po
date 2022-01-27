@@ -43,3 +43,7 @@ msgstr ""
 msgctxt "#31002"
 msgid "Source"
 msgstr ""
+
+msgctxt "#31003"
+msgid "Live"
+msgstr ""
