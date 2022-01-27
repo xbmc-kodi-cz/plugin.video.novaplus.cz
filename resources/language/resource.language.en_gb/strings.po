@@ -36,14 +36,14 @@ msgctxt "#30007"
 msgid "Categories"
 msgstr ""
 
+msgctxt "#30008"
+msgid "Live"
+msgstr ""
+
 msgctxt "#31001"
 msgid "General"
 msgstr ""
 
 msgctxt "#31002"
 msgid "Source"
-msgstr ""
-
-msgctxt "#31003"
-msgid "Live"
 msgstr ""
