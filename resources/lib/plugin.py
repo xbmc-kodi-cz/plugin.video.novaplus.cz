@@ -74,17 +74,24 @@ def list_live():
     listing = []
     articles = soup.find('ul', {
                          'class': 'js-channels-navigation-carousel'}).findAll('li')
-
     for article in articles:
         if article.find('a', {'data-channel-id': re.compile(r"[0-9]+")}):
             channel = article.find(
                 'span', {'class': 'e-logo'}).find('img')
-            show = article.find('h4').get_text()
             title = channel['alt']
-            label = u'[COLOR blue]{}[/COLOR] · {}'.format(title, show)
+            if article.find('li', {'class': 'e-channel'}):
+                show = article.find('h4').get_text()
+                if show:
+                    plot = '{0} -{1}'.format(article.find('span', {'class': 'e-time-start'}).get_text(
+                    ), article.find('span', {'class': 'e-time-end'}).get_text())
+                    label = u'[COLOR blue]{}[/COLOR] · {}'.format(title, show)
+            else:
+                show = None
+                plot = None
+                label = u'[COLOR blue]{}[/COLOR]'.format(title)
             list_item = xbmcgui.ListItem(label)
             list_item.setInfo(
-                'video', {'mediatype': 'tvshow', 'tvshowtitle': title, 'title': show, 'plot': '{0} -{1}'.format(article.find('span', {'class': 'e-time-start'}).get_text(), article.find('span', {'class': 'e-time-end'}).get_text()), 'playcount': 0})
+                'video', {'mediatype': 'tvshow', 'tvshowtitle': title, 'title': show, 'plot': plot, 'playcount': 0})
             list_item.setArt({'poster': channel['src']})
             list_item.setProperty('IsPlayable', 'true')
             listing.append(
@@ -94,7 +101,7 @@ def list_live():
     xbmcplugin.endOfDirectory(plugin.handle)
 
 
-@plugin.route('/get_list/')
+@ plugin.route('/get_list/')
 def get_list():
     xbmcplugin.setContent(plugin.handle, 'episodes')
     listing = []
@@ -136,7 +143,7 @@ def get_list():
     xbmcplugin.endOfDirectory(plugin.handle)
 
 
-@plugin.route('/get_category/')
+@ plugin.route('/get_category/')
 def get_category():
     listing = []
     soup = get_page(plugin.args['show_url'][0])
@@ -152,7 +159,7 @@ def get_category():
     xbmcplugin.endOfDirectory(plugin.handle)
 
 
-@plugin.route('/get_video/<path:url>')
+@ plugin.route('/get_video/<path:url>')
 def get_video(url):
     PROTOCOL = 'mpd'
     DRM = 'com.widevine.alpha'
