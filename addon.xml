@@ -1,4 +1,4 @@
-<addon id="plugin.video.novaplus.cz" name="Nova Plus" provider-name="Jiri Vyhnalek, wombat" version="1.3.4">
+<addon id="plugin.video.novaplus.cz" name="Nova" provider-name="Jiri Vyhnalek, wombat" version="1.3.4">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
         <import addon="script.module.requests" version="2.22.0" />
@@ -10,16 +10,16 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Nova Plus - online televize TV Nova</summary>
-        <summary lang="cs_CZ">Nova Plus - online televize TV Nova</summary>
-        <description lang="en_GB">Vaše oblíbené seriály, pořady a živé vysílání TV Nova na online televizi Nova Plus, které si pustíte, kdy chcete vy.</description>
-        <description lang="cs_CZ">Vaše oblíbené seriály, pořady a živé vysílání TV Nova na online televizi Nova Plus, které si pustíte, kdy chcete vy.</description>
+        <summary lang="en_GB">Pořady a seriály | TV Nova</summary>
+        <summary lang="cs_CZ">Pořady a seriály | TV Nova</summary>
+        <description lang="en_GB">Sledujte nejnovější epizody, bonusová videa a ukázky. Články, program, novinky a zajímavosti z našich pořadů.</description>
+        <description lang="cs_CZ">Sledujte nejnovější epizody, bonusová videa a ukázky. Články, program, novinky a zajímavosti z našich pořadů.</description>
         <platform>all</platform>
         <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
-        <news>Oprava sledování živě
+        <news>Přizpůsobení změn nového webu tv.nova.cz
         </news>
         <assets>
-            <icon>resources/icon.png</icon>
+            <icon>resources/icon-nova.png</icon>
         </assets>
     </extension>
 </addon>
