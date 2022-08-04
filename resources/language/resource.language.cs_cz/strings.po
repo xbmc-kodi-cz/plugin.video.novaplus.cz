@@ -13,8 +13,8 @@ msgid "Recent Episodes"
 msgstr "Poslední díly"
 
 msgctxt "#30002"
-msgid "TOP Shows"
-msgstr "TOP pořady"
+msgid "Best"
+msgstr "Nejlepší"
 
 msgctxt "#30003"
 msgid "Shows"
@@ -39,6 +39,14 @@ msgstr "Kategorie"
 msgctxt "#30008"
 msgid "Live"
 msgstr "Živě"
+
+msgctxt "#30009"
+msgid "New"
+msgstr "Nejnovější"
+
+msgctxt "#30010"
+msgid "All"
+msgstr "Všechny"
 
 msgctxt "#31001"
 msgid "General"
