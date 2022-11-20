@@ -16,7 +16,7 @@
         <description lang="cs_CZ">Sledujte nejnovější epizody, bonusová videa a ukázky. Články, program, novinky a zajímavosti z našich pořadů.</description>
         <platform>all</platform>
         <source>https://github.com/xbmc-kodi-cz/plugin.video.novaplus.cz</source>
-        <newsOprava poradu co nemaji url cele-dily (72ka)
+        <news>Oprava poradu co nemaji url cele-dily (72ka)
         </news>
         <assets>
             <icon>resources/icon-nova.png</icon>
