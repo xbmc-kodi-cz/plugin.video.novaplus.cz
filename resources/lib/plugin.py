@@ -159,6 +159,10 @@ def list_episodes():
             (plugin.url_for(get_category, show_url=url), list_item, True))
         url = plugin.args["show_url"][0] + "/videa/cele-dily"
     soup = get_page(url)
+    
+    if soup.find("div", "c-article-wrapper") is None:
+    	url = plugin.args["show_url"][0] + "/videa"
+    	soup = get_page(url)
     articles = soup.find(
         "div", "c-article-wrapper").find_all("article", "c-article")
     count = 0
