@@ -85,7 +85,7 @@ def list_recent_episodes():
             "[COLOR blue]{0}[/COLOR] · {1}".format(show_title, title))
         list_item.setProperty("IsPlayable", "true")
         list_item.setArt(
-            {"icon": img_res(article_hero.find("img")["data-src"])})
+            {"thumb": img_res(article_hero.find("img")["data-src"])})
         list_item.setInfo(
             "video",
             {
@@ -106,42 +106,43 @@ def list_recent_episodes():
     articles = soup.find("div", {
         "class": "c-article-transformer-carousel swiper-container js-article-transformer-carousel"}).find_all("article")
     for article in articles:
-        menuitems = []
+        if article["data-tracking-tile-asset"] not in ["article"]:
+            menuitems = []
 
-        show_title = article["data-tracking-tile-show-name"]
-        title = article["data-tracking-tile-name"]
-        dur = article.find("time", {"class": "duration"})
-        show_url = article.find("a", {"class": "category"})["href"]
+            show_title = article["data-tracking-tile-show-name"]
+            title = article["data-tracking-tile-name"]
+            dur = article.find("time", {"class": "duration"})
+            show_url = article.find("a", {"class": "category"})["href"]
 
-        list_item = xbmcgui.ListItem(
-            "[COLOR blue]{0}[/COLOR] · {1}".format(show_title, title))
-        menuitems.append(
-            (
-                _addon.getLocalizedString(30005),
-                "Container.Update(" + plugin.url_for(list_episodes, category="True",
-                                                     show_url=show_url) + ")",
+            list_item = xbmcgui.ListItem(
+                "[COLOR blue]{0}[/COLOR] · {1}".format(show_title, title))
+            menuitems.append(
+                (
+                    _addon.getLocalizedString(30005),
+                    "Container.Update(" + plugin.url_for(list_episodes, category="True",
+                                                         show_url=show_url) + ")",
+                )
             )
-        )
-        if dur:
-            dur = get_duration(dur.get_text())
-        list_item.setInfo(
-            "video",
-            {
-                "mediatype": "episode",
-                "tvshowtitle": show_title,
-                "title": title,
-                "aired": article.find("time", {"class": "date"})["datetime"],
-                "duration": dur,
-            },
-        )
-        list_item.setArt(
-            {"icon": img_res(article.find(
-                "picture").find("source")["data-srcset"])}
-        )
-        list_item.setProperty("IsPlayable", "true")
-        list_item.addContextMenuItems(menuitems)
-        listing.append((plugin.url_for(get_video, article.find(
-            "a", {"class": "img"})["href"]), list_item, False))
+            if dur:
+                dur = get_duration(dur.get_text())
+            list_item.setInfo(
+                "video",
+                {
+                    "mediatype": "episode",
+                    "tvshowtitle": show_title,
+                    "title": title,
+                    "aired": article.find("time", {"class": "date"})["datetime"],
+                    "duration": dur,
+                },
+            )
+            list_item.setArt(
+                {"thumb": img_res(article.find(
+                    "picture").find("source")["data-srcset"])}
+            )
+            list_item.setProperty("IsPlayable", "true")
+            list_item.addContextMenuItems(menuitems)
+            listing.append((plugin.url_for(get_video, article.find(
+                "a", {"class": "img"})["href"]), list_item, False))
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
@@ -159,10 +160,10 @@ def list_episodes():
             (plugin.url_for(get_category, show_url=url), list_item, True))
         url = plugin.args["show_url"][0] + "/videa/cele-dily"
     soup = get_page(url)
-    
+
     if soup.find("div", "c-article-wrapper") is None:
-    	url = plugin.args["show_url"][0] + "/videa"
-    	soup = get_page(url)
+        url = plugin.args["show_url"][0] + "/videa"
+        soup = get_page(url)
     articles = soup.find(
         "div", "c-article-wrapper").find_all("article", "c-article")
     count = 0
@@ -188,7 +189,7 @@ def list_episodes():
                 },
             )
             list_item.setArt(
-                {"icon": img_res(article.find(
+                {"thumb": img_res(article.find(
                     "picture").find("source")["data-srcset"])}
             )
             list_item.setProperty("IsPlayable", "true")
@@ -253,10 +254,8 @@ def get_video(url):
         soup.find("div", {"class": "js-login-player"}
                   ).find("iframe")["data-src"]
     )
-
-    json_data = json.loads(
-        re.compile('{"tracks":(.+?),"duration"').findall(str(embeded))[0]
-    )
+    json_data = json.loads(re.compile(
+        '{"tracks":(.+?),"duration"').findall(str(embeded))[0])
 
     if json_data:
         stream_data = json_data[source_type][0]
@@ -320,7 +319,7 @@ def get_page(url):
     r = requests.get(
         url,
         headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
         },
     )
     return BeautifulSoup(r.content, "html.parser")
