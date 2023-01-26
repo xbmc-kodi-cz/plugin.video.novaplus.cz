@@ -222,6 +222,93 @@ def list_episodes():
     xbmcplugin.endOfDirectory(plugin.handle)
 
 
+@ plugin.route("/list_latest_videos/")
+def list_latest_videos():
+    xbmcplugin.setContent(plugin.handle, "episodes")
+    listing = []
+
+    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30012))
+    listing.append(
+        (plugin.url_for(list_latest_videos, content=99), list_item, True))
+
+    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30013))
+    listing.append(
+        (plugin.url_for(list_latest_videos, content=112), list_item, True))
+
+    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30014))
+    listing.append(
+        (plugin.url_for(list_latest_videos, content=125), list_item, True))
+
+    url = None
+    print("nase data")
+    print(plugin.args)
+    if "show_url" in plugin.args:
+        url = plugin.args["show_url"][0]
+    elif "content" in plugin.args:
+        url = _baseurl+"/api/v1/mixed/more?page=1&offset=0&content=" + \
+            plugin.args["content"][0]
+
+    soup = get_page(url)
+
+    articles = soup.find(
+        "div", "c-article-wrapper").find_all("article", "c-article")
+    count = 0
+    show_title = None
+    for article in articles:
+        if '-voyo' not in article['class']:
+            show_title = article["data-tracking-tile-show-name"]
+            title = article["data-tracking-tile-name"]
+            dur = article.find("time", {"class": "duration"})
+            if dur:
+                dur = get_duration(dur.get_text())
+            aired = article.find("time", {"class": "date"})["datetime"]
+
+            list_item = xbmcgui.ListItem(
+                "[COLOR blue]{0}[/COLOR] · {1}".format(show_title, title))
+
+            list_item.setInfo(
+                "video",
+                {
+                    "mediatype": "episode",
+                    "tvshowtitle": show_title,
+                    "title": title,
+                    "aired": aired,
+                    "duration": dur,
+                },
+            )
+            list_item.setArt(
+                {"thumb": img_res(article.find(
+                    "picture").find("source")["data-srcset"])}
+            )
+            list_item.setProperty("IsPlayable", "true")
+            listing.append(
+                (
+                    plugin.url_for(get_video, article.find(
+                        "a", {"class": "img"})["href"]),
+                    list_item,
+                    False,
+                )
+            )
+            count += 1
+    next = soup.find("div", {"class": "js-load-more-trigger"})
+    if next and count > 0:
+        list_item = xbmcgui.ListItem(_addon.getLocalizedString(30004))
+        listing.append(
+            (
+                plugin.url_for(
+                    list_latest_videos,
+                    show_url=next.find("button")["data-href"],
+                    showtitle=show_title,
+                ),
+                list_item,
+                True,
+            )
+        )
+
+    xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
+    xbmcplugin.endOfDirectory(plugin.handle)
+
+
 @ plugin.route("/get_category/")
 def get_category():
     listing = []
@@ -332,6 +419,11 @@ def root():
     list_item = xbmcgui.ListItem(_addon.getLocalizedString(30001))
     list_item.setArt({"icon": "DefaultRecentlyAddedEpisodes.png"})
     listing.append((plugin.url_for(list_recent_episodes), list_item, True))
+
+    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30011))
+    list_item.setArt({"icon": "DefaultVideoPlaylists.png"})
+    listing.append(
+        (plugin.url_for(list_latest_videos, content=138), list_item, True))
 
     list_item = xbmcgui.ListItem(_addon.getLocalizedString(30003))
     list_item.setArt({"icon": "DefaultTVShows.png"})

@@ -48,6 +48,22 @@ msgctxt "#30010"
 msgid "All"
 msgstr ""
 
+msgctxt "#30011"
+msgid "Latest videos"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Full episodes"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Bonuses"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Samples"
+msgstr ""
+
 msgctxt "#31001"
 msgid "General"
 msgstr ""

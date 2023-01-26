@@ -48,6 +48,22 @@ msgctxt "#30010"
 msgid "All"
 msgstr "Všechny"
 
+msgctxt "#30011"
+msgid "Latest videos"
+msgstr "Nejnovější videa"
+
+msgctxt "#30012"
+msgid "Full episodes"
+msgstr "Celé díly"
+
+msgctxt "#30013"
+msgid "Bonuses"
+msgstr "Bonusy"
+
+msgctxt "#30014"
+msgid "Samples"
+msgstr "Ukázky"
+
 msgctxt "#31001"
 msgid "General"
 msgstr "Obecné"
