@@ -13,8 +13,8 @@ msgid "Recent Episodes"
 msgstr "Poslední díly"
 
 msgctxt "#30002"
-msgid "Best"
-msgstr "Nejlepší"
+msgid "TOP Shows"
+msgstr "TOP pořady"
 
 msgctxt "#30003"
 msgid "Shows"

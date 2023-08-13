@@ -13,7 +13,7 @@ msgid "Recent Episodes"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Best"
+msgid "TOP Shows"
 msgstr ""
 
 msgctxt "#30003"
