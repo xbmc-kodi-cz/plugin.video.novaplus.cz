@@ -366,10 +366,22 @@ def get_video(url):
     DRM = "com.widevine.alpha"
     source_type = _addon.getSetting("source_type")
     soup = get_page(url)
+
     json_stream = json.loads(
-        soup.find_all("script", type="application/ld+json")[1].string
+        soup.find(
+            "script", type="application/ld+json", text=re.compile(r"embedUrl")
+        ).string
     )
-    embeded = get_page(json_stream["video"]["embedUrl"])
+
+    if "video" in json_stream:
+        embeded_url = json_stream["video"]["embedUrl"]
+    elif "embedUrl" in json_stream:
+        embeded_url = json_stream["embedUrl"]
+    else:
+        pass
+
+    embeded = get_page(embeded_url)
+
     json_data = json.loads(
         re.compile('{"tracks":(.+?),"duration"').findall(str(embeded))[0]
     )
