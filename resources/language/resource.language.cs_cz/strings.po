@@ -64,6 +64,10 @@ msgctxt "#30014"
 msgid "Samples"
 msgstr "Ukázky"
 
+msgctxt "#30015"
+msgid "No shows"
+msgstr "Pořad nelze zobrazit"
+
 msgctxt "#31001"
 msgid "General"
 msgstr "Obecné"

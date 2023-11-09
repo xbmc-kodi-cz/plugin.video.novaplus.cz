@@ -181,14 +181,28 @@ def list_episodes():
         list_item = xbmcgui.ListItem(_addon.getLocalizedString(30007))
         listing.append((plugin.url_for(get_category, show_url=url), list_item, True))
         url = plugin.args["show_url"][0] + "/videa/cele-dily"
-    soup = get_page(url)
 
-    if soup.find("div", "c-article-wrapper") is None:
+    soup = get_page(url)
+    if not soup:
         url = plugin.args["show_url"][0] + "/videa"
         soup = get_page(url)
-    articles = soup.find("div", "c-article-wrapper").find_all("article", "c-article")
+
+    try:
+        articles = soup.find("div", "c-article-wrapper").find_all(
+            "article", "c-article"
+        )
+    except:
+        xbmcgui.Dialog().notification(
+            _addon.getAddonInfo("name"),
+            _addon.getLocalizedString(30015),
+            xbmcgui.NOTIFICATION_ERROR,
+            5000,
+        )
+        return
+
     count = 0
     show_title = None
+
     for article in articles:
         if "-voyo" not in article["class"]:
             show_title = article["data-tracking-tile-show-name"]
@@ -227,21 +241,24 @@ def list_episodes():
                 )
             )
             count += 1
-    next = soup.find("div", {"class": "js-load-more-trigger"})
-    if next and count > 0:
-        list_item = xbmcgui.ListItem(_addon.getLocalizedString(30004))
-        listing.append(
-            (
-                plugin.url_for(
-                    list_episodes,
-                    category=False,
-                    show_url=next.find("button")["data-href"],
-                    showtitle=show_title,
-                ),
-                list_item,
-                True,
+    try:
+        next = soup.find("div", {"class": "c-section-cta"})
+        if next and count > 0:
+            list_item = xbmcgui.ListItem(_addon.getLocalizedString(30004))
+            listing.append(
+                (
+                    plugin.url_for(
+                        list_episodes,
+                        category=False,
+                        show_url=next.find("button")["data-href"],
+                        showtitle=show_title,
+                    ),
+                    list_item,
+                    True,
+                )
             )
-        )
+    except:
+        pass
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
@@ -250,31 +267,30 @@ def list_episodes():
 @plugin.route("/list_latest_videos/")
 def list_latest_videos():
     xbmcplugin.setContent(plugin.handle, "episodes")
+
     listing = []
 
-    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30012))
-    listing.append((plugin.url_for(list_latest_videos, content=99), list_item, True))
+    if "content" not in plugin.args:
+        list_item = xbmcgui.ListItem(_addon.getLocalizedString(30013))
+        listing.append(
+            (plugin.url_for(list_latest_videos, content="bonusy"), list_item, True)
+        )
 
-    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30013))
-    listing.append((plugin.url_for(list_latest_videos, content=112), list_item, True))
-
-    list_item = xbmcgui.ListItem(_addon.getLocalizedString(30014))
-    listing.append((plugin.url_for(list_latest_videos, content=125), list_item, True))
-
-    url = None
+        list_item = xbmcgui.ListItem(_addon.getLocalizedString(30014))
+        listing.append(
+            (plugin.url_for(list_latest_videos, content="ukazky"), list_item, True)
+        )
 
     if "show_url" in plugin.args:
         url = plugin.args["show_url"][0]
     elif "content" in plugin.args:
-        url = (
-            _baseurl
-            + "/api/v1/mixed/more?page=1&offset=0&content="
-            + plugin.args["content"][0]
-        )
+        url = url = _baseurl + "videa/" + plugin.args["content"][0]
+    else:
+        url = _baseurl + "videa/cele-dily"
 
     soup = get_page(url)
 
-    articles = soup.find("div", "c-article-wrapper").find_all("article", "c-article")
+    articles = soup.find("div", "js-article-load-more").find_all("article", "c-article")
     count = 0
     show_title = None
     for article in articles:
@@ -318,7 +334,8 @@ def list_latest_videos():
                 )
             )
             count += 1
-    next = soup.find("div", {"class": "js-load-more-trigger"})
+
+    next = soup.find("div", {"class": "c-section-cta"})
     if next and count > 0:
         list_item = xbmcgui.ListItem(_addon.getLocalizedString(30004))
         listing.append(
@@ -344,17 +361,18 @@ def get_category():
     navs = soup.find("nav", "c-tabs")
     if navs:
         for nav in navs.find_all("a"):
-            list_item = xbmcgui.ListItem(nav.get_text())
-            list_item.setInfo("video", {"mediatype": "episode"})
-            listing.append(
-                (
-                    plugin.url_for(
-                        list_episodes, category="False", show_url=nav["href"]
-                    ),
-                    list_item,
-                    True,
+            if "/videa" in nav["href"]:
+                list_item = xbmcgui.ListItem(nav.get_text())
+                list_item.setInfo("video", {"mediatype": "episode"})
+                listing.append(
+                    (
+                        plugin.url_for(
+                            list_episodes, category="False", show_url=nav["href"]
+                        ),
+                        list_item,
+                        True,
+                    )
                 )
-            )
 
     xbmcplugin.addDirectoryItems(plugin.handle, listing, len(listing))
     xbmcplugin.endOfDirectory(plugin.handle)
@@ -445,10 +463,11 @@ def get_page(url):
     r = requests.get(
         url,
         headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         },
     )
-    return BeautifulSoup(r.content, "html.parser")
+    if r.status_code == 200:
+        return BeautifulSoup(r.content, "html.parser")
 
 
 @plugin.route("/")
@@ -461,7 +480,7 @@ def root():
 
     list_item = xbmcgui.ListItem(_addon.getLocalizedString(30011))
     list_item.setArt({"icon": "DefaultVideoPlaylists.png"})
-    listing.append((plugin.url_for(list_latest_videos, content=138), list_item, True))
+    listing.append((plugin.url_for(list_latest_videos), list_item, True))
 
     list_item = xbmcgui.ListItem(_addon.getLocalizedString(30003))
     list_item.setArt({"icon": "DefaultTVShows.png"})

@@ -64,6 +64,10 @@ msgctxt "#30014"
 msgid "Samples"
 msgstr ""
 
+msgctxt "#30015"
+msgid "No shows"
+msgstr ""
+
 msgctxt "#31001"
 msgid "General"
 msgstr ""
