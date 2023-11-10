@@ -67,6 +67,7 @@ def list_recent_episodes():
     xbmcplugin.setContent(plugin.handle, "episodes")
     soup = get_page(_baseurl)
     listing = []
+    menuitems = []
 
     dur = 0
     title = None
@@ -78,10 +79,12 @@ def list_recent_episodes():
 
     try:
         show_title = article_hero.find("h2", {"class": "title"}).find("a").get_text()
+        show_url = article_hero.find("h2", {"class": "title"}).find("a")["href"]
         title = article_hero.find("h3", {"class": "subtitle"}).find("a").get_text()
         dur = article_hero.find("time", {"class": "duration"}).get_text()
         aired = article_hero.find("time", {"class": "date"})["datetime"]
         video = article_hero.find("div", {"class": "actions"}).find("a")["href"]
+
     except:
         pass
 
@@ -110,6 +113,16 @@ def list_recent_episodes():
                 False,
             )
         )
+
+        menuitems.append(
+            (
+                _addon.getLocalizedString(30005),
+                "Container.Update("
+                + plugin.url_for(list_episodes, category="True", show_url=show_url)
+                + ")",
+            )
+        )
+        list_item.addContextMenuItems(menuitems)
     articles = soup.find(
         "div",
         {
@@ -191,7 +204,7 @@ def list_episodes():
         articles = soup.find("div", "c-article-wrapper").find_all(
             "article", "c-article"
         )
-    except:
+    except Exception as e:
         xbmcgui.Dialog().notification(
             _addon.getAddonInfo("name"),
             _addon.getLocalizedString(30015),
@@ -269,8 +282,9 @@ def list_latest_videos():
     xbmcplugin.setContent(plugin.handle, "episodes")
 
     listing = []
+    menuitems = []
 
-    if "content" not in plugin.args:
+    if not any(arg in plugin.args for arg in ["content", "show_url"]):
         list_item = xbmcgui.ListItem(_addon.getLocalizedString(30013))
         listing.append(
             (plugin.url_for(list_latest_videos, content="bonusy"), list_item, True)
@@ -295,12 +309,15 @@ def list_latest_videos():
     show_title = None
     for article in articles:
         if "-voyo" not in article["class"]:
+            menuitems = []
             show_title = article["data-tracking-tile-show-name"]
             title = article["data-tracking-tile-name"]
             dur = article.find("time", {"class": "duration"})
             if dur:
                 dur = get_duration(dur.get_text())
             aired = article.find("time", {"class": "date"})["datetime"]
+
+            show_url = article.find("div", {"class": "content"}).find("a")["href"]
 
             list_item = xbmcgui.ListItem(
                 "[COLOR blue]{0}[/COLOR] · {1}".format(show_title, title)
@@ -333,6 +350,15 @@ def list_latest_videos():
                     False,
                 )
             )
+            menuitems.append(
+                (
+                    _addon.getLocalizedString(30005),
+                    "Container.Update("
+                    + plugin.url_for(list_episodes, category="True", show_url=show_url)
+                    + ")",
+                )
+            )
+            list_item.addContextMenuItems(menuitems)
             count += 1
 
     next = soup.find("div", {"class": "c-section-cta"})
@@ -448,15 +474,17 @@ def get_duration(dur):
 
 
 def img_res(url):
-    if "314x175" in url:
-        r = url.replace("314x175", "942x525")
-    elif "275x153" in url:
-        r = url.replace("275x153", "825x459")
-    elif "276x383" in url:
-        r = url.replace("276x383", "828x1149")
-    else:
-        r = url
-    return r
+    dimensions_mapping = {
+        "314x175": "942x525",
+        "275x153": "825x459",
+        "276x383": "828x1149",
+    }
+
+    for old_dim, new_dim in dimensions_mapping.items():
+        if old_dim in url:
+            return url.replace(old_dim, new_dim)
+
+    return url
 
 
 def get_page(url):
