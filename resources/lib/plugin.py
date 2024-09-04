@@ -450,8 +450,7 @@ def get_video(url):
             
     if stream_data:
         list_item = xbmcgui.ListItem()
-        list_item.setPath(stream_data["src"])
-        
+              
         is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
         if is_helper.check_inputstream():
             list_item.setPath(stream_data["src"])
