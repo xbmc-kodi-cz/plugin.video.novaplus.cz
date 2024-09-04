@@ -408,8 +408,11 @@ def get_category():
 def get_video(url):
     PROTOCOL = "mpd"
     DRM = "com.widevine.alpha"
-    source_type = _addon.getSetting("source_type")
     soup = get_page(url)
+    
+    drm = None
+    drm_server = None
+    drm_token = None
 
     json_stream = json.loads(
         soup.find(
@@ -426,35 +429,45 @@ def get_video(url):
 
     embeded = get_page(embeded_url)
 
-    json_data = json.loads(
-        re.compile('{"tracks":(.+?),"duration"').findall(str(embeded))[0]
-    )
-    if json_data:
-        stream_data = json_data[source_type][0]
+    try:
+        json_data = json.loads(re.compile('{"tracks":(.+?),"duration"').findall(str(embeded))[0])
+        stream_data = json_data["DASH"][0]
+        try:
+            drm = stream_data["drm"][1]
+            drm_server = drm["serverURL"]
+            drm_token = drm["headers"][0]["value"]
+        except:
+            pass
+    except:
+        json_data = json.loads(json.dumps(re.compile("player: (.+)").findall(str(embeded))))
+        stream_data = json.loads(json_data[0])["lib"]["source"]["sources"][1]
+        try:
+            drm = stream_data["contentProtection"]
+            drm_server = drm["widevine"]["licenseAcquisitionURL"]
+            drm_token = drm["token"]
+        except:
+            pass
+            
+    if stream_data:
         list_item = xbmcgui.ListItem()
-
-        if not "drm" in stream_data and source_type == "HLS":
+        list_item.setPath(stream_data["src"])
+        
+        is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
+        if is_helper.check_inputstream():
             list_item.setPath(stream_data["src"])
-        else:
-            is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
-            if is_helper.check_inputstream():
-                stream_data = json_data["DASH"][0]
-                list_item.setPath(stream_data["src"])
-                list_item.setContentLookup(False)
-                list_item.setMimeType("application/xml+dash")
-                list_item.setProperty("inputstream", "inputstream.adaptive")
-                list_item.setProperty("inputstream.adaptive.manifest_type", PROTOCOL)
-                if "drm" in stream_data:
-                    drm = stream_data["drm"][1]
-                    list_item.setProperty("inputstream.adaptive.license_type", DRM)
-                    list_item.setProperty(
-                        "inputstream.adaptive.license_key",
-                        drm["serverURL"]
-                        + "|"
-                        + "X-AxDRM-Message="
-                        + drm["headers"][0]["value"]
-                        + "|R{SSM}|",
-                    )
+            list_item.setContentLookup(False)
+            list_item.setMimeType("application/xml+dash")
+            list_item.setProperty("inputstream", "inputstream.adaptive")
+            if drm_server:
+                list_item.setProperty("inputstream.adaptive.license_type", DRM)
+                list_item.setProperty(
+                    "inputstream.adaptive.license_key",
+                    drm_server
+                    + "|"
+                    + "X-AxDRM-Message="
+                    + drm_token
+                    + "|R{SSM}|",
+                )
         xbmcplugin.setResolvedUrl(plugin.handle, True, list_item)
     else:
         xbmcgui.Dialog().notification(
