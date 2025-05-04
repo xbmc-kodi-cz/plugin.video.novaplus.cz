@@ -26,7 +26,10 @@ def list_shows(type):
     for article in articles:
         title = article["data-tracking-tile-name"]
         list_item = xbmcgui.ListItem(title)
-        list_item.setInfo("video", {"mediatype": "tvshow", "title": title})
+
+        info = list_item.getVideoInfoTag()
+        info.setTitle(title)
+
         list_item.setArt({"poster": img_res(article.div.img["data-src"])})
         listing.append(
             (
@@ -96,16 +99,27 @@ def list_recent_episodes():
         )
         list_item.setProperty("IsPlayable", "true")
         list_item.setArt({"thumb": img_res(article_hero.find("img")["data-src"])})
-        list_item.setInfo(
-            "video",
-            {
-                "mediatype": "episode",
-                "tvshowtitle": show_title,
-                "title": title,
-                "aired": aired,
-                "duration": dur,
-            },
-        )
+
+        info = list_item.getVideoInfoTag()
+
+        # info.setPlot(plot)
+        # info.setGenre(genre)
+        # info.setSeason(season)
+        # info.setEpisode(episode)
+        info.setTitle(title)
+        info.setTvShowTitle(show_title)
+        info.setDuration(dur)
+
+        # list_item.setInfo(
+        #     "video",
+        #     {
+        #         "mediatype": "episode",
+        #         "tvshowtitle": show_title,
+        #         "title": title,
+        #         "aired": aired,
+        #         "duration": dur,
+        #     },
+        # )
         listing.append(
             (
                 plugin.url_for(get_video, video),
@@ -323,16 +337,12 @@ def list_latest_videos():
                 "[COLOR blue]{0}[/COLOR] · {1}".format(show_title, title)
             )
 
-            list_item.setInfo(
-                "video",
-                {
-                    "mediatype": "episode",
-                    "tvshowtitle": show_title,
-                    "title": title,
-                    "aired": aired,
-                    "duration": dur,
-                },
-            )
+            info_tag = list_item.getVideoInfoTag()
+            info_tag.setTitle(title)
+            info_tag.setTvShowTitle(show_title)
+            info_tag.setDuration(dur)
+            info_tag.setPremiered(aired)
+
             list_item.setArt(
                 {
                     "thumb": img_res(
@@ -389,7 +399,6 @@ def get_category():
         for nav in navs.find_all("a"):
             if "/videa" in nav["href"]:
                 list_item = xbmcgui.ListItem(nav.get_text())
-                list_item.setInfo("video", {"mediatype": "episode"})
                 listing.append(
                     (
                         plugin.url_for(
@@ -409,7 +418,7 @@ def get_video(url):
     PROTOCOL = "mpd"
     DRM = "com.widevine.alpha"
     soup = get_page(url)
-    
+
     drm = None
     drm_server = None
     drm_token = None
@@ -430,7 +439,9 @@ def get_video(url):
     embeded = get_page(embeded_url)
 
     try:
-        json_data = json.loads(re.compile('{"tracks":(.+?),"duration"').findall(str(embeded))[0])
+        json_data = json.loads(
+            re.compile('{"tracks":(.+?),"duration"').findall(str(embeded))[0]
+        )
         stream_data = json_data["DASH"][0]
         try:
             drm = stream_data["drm"][1]
@@ -439,7 +450,9 @@ def get_video(url):
         except:
             pass
     except:
-        json_data = json.loads(json.dumps(re.compile("player: (.+)").findall(str(embeded))))
+        json_data = json.loads(
+            json.dumps(re.compile("player: (.+)").findall(str(embeded)))
+        )
         stream_data = json.loads(json_data[0])["lib"]["source"]["sources"][1]
         try:
             drm = stream_data["contentProtection"]
@@ -447,10 +460,10 @@ def get_video(url):
             drm_token = drm["token"]
         except:
             pass
-            
+
     if stream_data:
         list_item = xbmcgui.ListItem()
-              
+
         is_helper = inputstreamhelper.Helper(PROTOCOL, drm=DRM)
         if is_helper.check_inputstream():
             list_item.setPath(stream_data["src"])
@@ -459,13 +472,10 @@ def get_video(url):
             list_item.setProperty("inputstream", "inputstream.adaptive")
             if drm_server:
                 list_item.setProperty("inputstream.adaptive.license_type", DRM)
+                list_item.setProperty("inputstream.adaptive.manifest_type", "DASH")
                 list_item.setProperty(
                     "inputstream.adaptive.license_key",
-                    drm_server
-                    + "|"
-                    + "X-AxDRM-Message="
-                    + drm_token
-                    + "|R{SSM}|",
+                    drm_server + "|" + "X-AxDRM-Message=" + drm_token + "|R{SSM}|",
                 )
         xbmcplugin.setResolvedUrl(plugin.handle, True, list_item)
     else:
