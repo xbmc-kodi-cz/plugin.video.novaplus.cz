@@ -208,16 +208,13 @@ def list_episodes():
         list_item = xbmcgui.ListItem(_addon.getLocalizedString(30007))
         listing.append((plugin.url_for(get_category, show_url=url), list_item, True))
         url = plugin.args["show_url"][0] + "/videa/cele-dily"
-
     soup = get_page(url)
-    if not soup:
-        url = plugin.args["show_url"][0] + "/videa"
-        soup = get_page(url)
-
     try:
-        articles = soup.find("div", "c-article-wrapper").find_all(
-            "article", "c-article"
-        )
+        articles = soup.find_all("article", class_="c-article")
+        if not articles:
+            url = plugin.args["show_url"][0] + "/videa"
+            soup = get_page(url)
+            articles = soup.find_all("article", class_="c-article")
     except Exception as e:
         xbmcgui.Dialog().notification(
             _addon.getAddonInfo("name"),
@@ -513,7 +510,7 @@ def get_page(url):
     r = requests.get(
         url,
         headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
         },
     )
     if r.status_code == 200:
