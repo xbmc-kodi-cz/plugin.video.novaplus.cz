@@ -12,10 +12,6 @@ msgctxt "#30001"
 msgid "Recent Episodes"
 msgstr "Poslední díly"
 
-msgctxt "#30002"
-msgid "TOP Shows"
-msgstr "TOP pořady"
-
 msgctxt "#30003"
 msgid "Shows"
 msgstr "Pořady"
@@ -36,14 +32,6 @@ msgctxt "#30007"
 msgid "Categories"
 msgstr "Kategorie"
 
-msgctxt "#30008"
-msgid "Live"
-msgstr "Živě"
-
-msgctxt "#30009"
-msgid "New"
-msgstr "Nejnovější"
-
 msgctxt "#30010"
 msgid "All"
 msgstr "Všechny"
@@ -52,26 +40,22 @@ msgctxt "#30011"
 msgid "Latest videos"
 msgstr "Nejnovější videa"
 
-msgctxt "#30012"
-msgid "Full episodes"
-msgstr "Celé díly"
-
-msgctxt "#30013"
-msgid "Bonuses"
-msgstr "Bonusy"
-
-msgctxt "#30014"
-msgid "Samples"
-msgstr "Ukázky"
-
 msgctxt "#30015"
 msgid "No shows"
 msgstr "Pořad nelze zobrazit"
 
-msgctxt "#31001"
-msgid "General"
-msgstr "Obecné"
+msgctxt "#30016"
+msgid "Could not load the page"
+msgstr "Nepodařilo se načíst stránku"
 
-msgctxt "#31002"
-msgid "Source"
-msgstr "Zdroj"
+msgctxt "#30017"
+msgid "Unexpected error, see the log"
+msgstr "Neočekávaná chyba, podrobnosti v logu"
+
+msgctxt "#30018"
+msgid "No free videos"
+msgstr "Žádná volná videa"
+
+msgctxt "#30019"
+msgid "Search"
+msgstr "Hledat"
